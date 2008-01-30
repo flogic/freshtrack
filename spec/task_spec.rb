@@ -85,6 +85,38 @@ describe FreshBooks::Task do
     end
   end
   
+  describe 'updating an instance' do
+    before :each do
+      @response = stub('response', :success? => nil)
+      FreshBooks.stubs(:call_api).returns(@response)
+    end
+    
+    it 'should issue a request with the instance' do
+      FreshBooks.expects(:call_api).with('task.update', 'task' => @task).returns(@response)
+      @task.update
+    end
+    
+    describe 'with a successful request' do
+      before :each do
+        @response.stubs(:success?).returns(true)
+      end
+      
+      it 'should return true' do
+        @task.update.should be(true)
+      end
+    end
+    
+    describe 'with an unsuccessful request' do
+      before :each do
+        @response.stubs(:success?).returns(false)
+      end
+      
+      it 'should return false' do
+        @task.update.should be(false)
+      end
+    end
+  end
+  
   describe 'getting an instance' do
     before :each do
       @task_id = 1

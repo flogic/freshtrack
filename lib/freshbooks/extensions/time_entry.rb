@@ -28,6 +28,11 @@ module FreshBooks
       end
     end
     
+    def update
+      resp = FreshBooks.call_api('time_entry.update', 'time_entry' => self)
+      resp.success?
+    end
+    
     def task
       Task.get(task_id)
     end

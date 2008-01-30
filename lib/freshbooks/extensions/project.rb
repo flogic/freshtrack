@@ -29,6 +29,11 @@ module FreshBooks
       end
     end
     
+    def update
+      resp = FreshBooks.call_api('project.update', 'project' => self)
+      resp.success?
+    end
+    
     def client
       Client.get(client_id)
     end
