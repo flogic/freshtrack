@@ -114,9 +114,23 @@ describe FreshBooks::TimeEntry do
       FreshBooks.stubs(:call_api).returns(@response)
     end
     
+    it 'should not require an argument' do
+      lambda { FreshBooks::TimeEntry.list }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should accept an argument' do
+      lambda { FreshBooks::TimeEntry.list('arg') }.should_not raise_error(ArgumentError)
+    end
+    
     it 'should issue a request for the time_entry list' do
-      FreshBooks.expects(:call_api).with('time_entry.list').returns(@response)
+      FreshBooks.expects(:call_api).with('time_entry.list', {}).returns(@response)
       FreshBooks::TimeEntry.list
+    end
+    
+    it 'should pass the argument to the request' do
+      arg = stub('arg')
+      FreshBooks.expects(:call_api).with('time_entry.list', arg).returns(@response)
+      FreshBooks::TimeEntry.list(arg)
     end
     
     describe 'with a successful request' do

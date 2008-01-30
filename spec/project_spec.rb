@@ -106,9 +106,23 @@ describe FreshBooks::Project do
       FreshBooks.stubs(:call_api).returns(@response)
     end
     
-    it 'should issue a request for the project list' do
-      FreshBooks.expects(:call_api).with('project.list').returns(@response)
+    it 'should not require an argument' do
+      lambda { FreshBooks::Project.list }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should accept an argument' do
+      lambda { FreshBooks::Project.list('arg') }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should issue a request for the time_entry list' do
+      FreshBooks.expects(:call_api).with('project.list', {}).returns(@response)
       FreshBooks::Project.list
+    end
+    
+    it 'should pass the argument to the request' do
+      arg = stub('arg')
+      FreshBooks.expects(:call_api).with('project.list', arg).returns(@response)
+      FreshBooks::Project.list(arg)
     end
     
     describe 'with a successful request' do
