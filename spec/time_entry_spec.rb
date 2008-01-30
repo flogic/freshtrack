@@ -71,7 +71,7 @@ describe FreshBooks::TimeEntry do
     describe 'with a successful request' do
       before :each do
         @time_entry_id = 5
-        @response.stubs(:elements).returns([stub('pre element'), @time_entry_id.to_s, stub('post element')])
+        @response.stubs(:elements).returns([stub('pre element'), stub('element', :text => @time_entry_id.to_s), stub('post element')])
         @response.stubs(:success?).returns(true)
       end
       

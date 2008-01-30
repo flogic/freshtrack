@@ -30,7 +30,7 @@ module FreshBooks
     def create
       resp = FreshBooks.call_api('task.create', 'task' => self)
       if resp.success?
-        self.task_id = resp.elements[1].to_i
+        self.task_id = resp.elements[1].text.to_i
       end
     end
     

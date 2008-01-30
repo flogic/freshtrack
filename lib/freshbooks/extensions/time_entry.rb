@@ -29,7 +29,7 @@ module FreshBooks
     def create
       resp = FreshBooks.call_api('time_entry.create', 'time_entry' => self)
       if resp.success?
-        self.time_entry_id = resp.elements[1].to_i
+        self.time_entry_id = resp.elements[1].text.to_i
       end
     end
     

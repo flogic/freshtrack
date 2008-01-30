@@ -30,7 +30,7 @@ module FreshBooks
     def create
       resp = FreshBooks.call_api('project.create', 'project' => self)
       if resp.success?
-        self.project_id = resp.elements[1].to_i
+        self.project_id = resp.elements[1].text.to_i
       end
     end
     
