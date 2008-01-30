@@ -20,6 +20,11 @@ module FreshBooks
       def find_by_name(name)
         list.detect { |p|  p.name == name }
       end
+      
+      def delete(task_id)
+        resp = FreshBooks.call_api('task.delete', 'task_id' => task_id)
+        resp.success?
+      end
     end
     
     def create
@@ -32,6 +37,10 @@ module FreshBooks
     def update
       resp = FreshBooks.call_api('task.update', 'task' => self)
       resp.success?
+    end
+    
+    def delete
+      self.class.delete(task_id)
     end
     
     def time_entries

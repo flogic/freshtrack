@@ -125,6 +125,72 @@ describe FreshBooks::Project do
     end
   end
   
+  describe 'deleting an instance' do
+    before :each do
+      @project_id = '5'
+      @response = stub('response', :success? => nil)
+      FreshBooks.stubs(:call_api).returns(@response)
+    end
+    
+    describe 'from the class' do
+      it 'should require an argument' do
+        lambda { FreshBooks::Project.delete }.should raise_error(ArgumentError)
+      end
+      
+      it 'should accept an argument' do
+        lambda { FreshBooks::Project.delete('arg') }.should_not raise_error(ArgumentError)
+      end
+      
+      it 'should issue a request with the supplied ID' do
+        FreshBooks.expects(:call_api).with('project.delete', 'project_id' => @project_id).returns(@response)
+        FreshBooks::Project.delete(@project_id)
+      end
+      
+      describe 'with a successful request' do
+        before :each do
+          @response.stubs(:success?).returns(true)
+        end
+        
+        it 'should return true' do
+          FreshBooks::Project.delete(@project_id).should be(true)
+        end
+      end
+      
+      describe 'with an unsuccessful request' do
+        before :each do
+          @response.stubs(:success?).returns(false)
+        end
+        
+        it 'should return false' do
+          FreshBooks::Project.delete(@project_id).should be(false)
+        end
+      end
+    end
+    
+    describe 'from the instance' do
+      before :each do
+        @project.stubs(:project_id).returns(@project_id)
+        FreshBooks::Project.stubs(:delete)
+      end
+      
+      it 'should delegate to the class' do
+        FreshBooks::Project.expects(:delete)
+        @project.delete
+      end
+      
+      it 'should pass its ID to the class method' do
+        FreshBooks::Project.expects(:delete).with(@project_id)
+        @project.delete
+      end
+      
+      it 'should return the result from the class method' do
+        val = stub('return val')
+        FreshBooks::Project.stubs(:delete).returns(val)
+        @project.delete.should == val
+      end
+    end
+  end
+  
   describe 'getting an instance' do
     before :each do
       @project_id = 1

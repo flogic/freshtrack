@@ -19,6 +19,11 @@ module FreshBooks
         return nil unless resp.success?
         resp.elements.collect { |elem|  new_from_xml(elem) }
       end
+      
+      def delete(time_entry_id)
+        resp = FreshBooks.call_api('time_entry.delete', 'time_entry_id' => time_entry_id)
+        resp.success?
+      end
     end
     
     def create
@@ -31,6 +36,10 @@ module FreshBooks
     def update
       resp = FreshBooks.call_api('time_entry.update', 'time_entry' => self)
       resp.success?
+    end
+    
+    def delete
+      self.class.delete(time_entry_id)
     end
     
     def task

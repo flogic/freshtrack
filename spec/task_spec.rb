@@ -117,6 +117,72 @@ describe FreshBooks::Task do
     end
   end
   
+  describe 'deleting an instance' do
+    before :each do
+      @task_id = '5'
+      @response = stub('response', :success? => nil)
+      FreshBooks.stubs(:call_api).returns(@response)
+    end
+    
+    describe 'from the class' do
+      it 'should require an argument' do
+        lambda { FreshBooks::Task.delete }.should raise_error(ArgumentError)
+      end
+      
+      it 'should accept an argument' do
+        lambda { FreshBooks::Task.delete('arg') }.should_not raise_error(ArgumentError)
+      end
+      
+      it 'should issue a request with the supplied ID' do
+        FreshBooks.expects(:call_api).with('task.delete', 'task_id' => @task_id).returns(@response)
+        FreshBooks::Task.delete(@task_id)
+      end
+      
+      describe 'with a successful request' do
+        before :each do
+          @response.stubs(:success?).returns(true)
+        end
+        
+        it 'should return true' do
+          FreshBooks::Task.delete(@task_id).should be(true)
+        end
+      end
+      
+      describe 'with an unsuccessful request' do
+        before :each do
+          @response.stubs(:success?).returns(false)
+        end
+        
+        it 'should return false' do
+          FreshBooks::Task.delete(@task_id).should be(false)
+        end
+      end
+    end
+    
+    describe 'from the instance' do
+      before :each do
+        @task.stubs(:task_id).returns(@task_id)
+        FreshBooks::Task.stubs(:delete)
+      end
+      
+      it 'should delegate to the class' do
+        FreshBooks::Task.expects(:delete)
+        @task.delete
+      end
+      
+      it 'should pass its ID to the class method' do
+        FreshBooks::Task.expects(:delete).with(@task_id)
+        @task.delete
+      end
+      
+      it 'should return the result from the class method' do
+        val = stub('return val')
+        FreshBooks::Task.stubs(:delete).returns(val)
+        @task.delete.should == val
+      end
+    end
+  end
+  
   describe 'getting an instance' do
     before :each do
       @task_id = 1

@@ -133,6 +133,72 @@ describe FreshBooks::TimeEntry do
     end
   end
   
+  describe 'deleting an instance' do
+    before :each do
+      @time_entry_id = '5'
+      @response = stub('response', :success? => nil)
+      FreshBooks.stubs(:call_api).returns(@response)
+    end
+    
+    describe 'from the class' do
+      it 'should require an argument' do
+        lambda { FreshBooks::TimeEntry.delete }.should raise_error(ArgumentError)
+      end
+      
+      it 'should accept an argument' do
+        lambda { FreshBooks::TimeEntry.delete('arg') }.should_not raise_error(ArgumentError)
+      end
+      
+      it 'should issue a request with the supplied ID' do
+        FreshBooks.expects(:call_api).with('time_entry.delete', 'time_entry_id' => @time_entry_id).returns(@response)
+        FreshBooks::TimeEntry.delete(@time_entry_id)
+      end
+      
+      describe 'with a successful request' do
+        before :each do
+          @response.stubs(:success?).returns(true)
+        end
+        
+        it 'should return true' do
+          FreshBooks::TimeEntry.delete(@time_entry_id).should be(true)
+        end
+      end
+      
+      describe 'with an unsuccessful request' do
+        before :each do
+          @response.stubs(:success?).returns(false)
+        end
+        
+        it 'should return false' do
+          FreshBooks::TimeEntry.delete(@time_entry_id).should be(false)
+        end
+      end
+    end
+    
+    describe 'from the instance' do
+      before :each do
+        @time_entry.stubs(:time_entry_id).returns(@time_entry_id)
+        FreshBooks::TimeEntry.stubs(:delete)
+      end
+      
+      it 'should delegate to the class' do
+        FreshBooks::TimeEntry.expects(:delete)
+        @time_entry.delete
+      end
+      
+      it 'should pass its ID to the class method' do
+        FreshBooks::TimeEntry.expects(:delete).with(@time_entry_id)
+        @time_entry.delete
+      end
+      
+      it 'should return the result from the class method' do
+        val = stub('return val')
+        FreshBooks::TimeEntry.stubs(:delete).returns(val)
+        @time_entry.delete.should == val
+      end
+    end
+  end
+  
   describe 'getting an instance' do
     before :each do
       @time_entry_id = 1
