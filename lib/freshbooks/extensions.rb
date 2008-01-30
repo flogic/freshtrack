@@ -1,2 +1,2 @@
 require 'freshbooks'
-require 'freshbooks/extensions/baseobject'
+require 'freshbooks/extensions/base_object'
