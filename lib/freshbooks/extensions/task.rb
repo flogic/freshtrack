@@ -21,5 +21,9 @@ module FreshBooks
         list.detect { |p|  p.name == name }
       end
     end
+    
+    def time_entries
+      TimeEntry.list('task_id' => task_id)
+    end
   end
 end

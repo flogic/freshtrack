@@ -184,4 +184,25 @@ describe FreshBooks::Task do
       FreshBooks::Task.find_by_name(@name).should be_nil
     end
   end
+  
+  it 'should have time entries' do
+    @task.should respond_to(:time_entries)
+  end
+  
+  describe 'time entries' do
+    it 'should list time entries based on task ID' do
+      task_id = stub('task ID')
+      @task.stubs(:task_id).returns(task_id)
+      FreshBooks::TimeEntry.expects(:list).with('task_id' => task_id)
+      @task.time_entries
+    end
+    
+    it 'should return found time entries' do
+      time_entries = stub('time entries')
+      task_id = stub('task ID')
+      @task.stubs(:task_id).returns(task_id)
+      FreshBooks::TimeEntry.stubs(:list).with('task_id' => task_id).returns(time_entries)
+      @task.time_entries.should == time_entries
+    end
+  end
 end

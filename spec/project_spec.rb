@@ -234,4 +234,25 @@ describe FreshBooks::Project do
       @project.tasks.should == tasks
     end
   end
+  
+  it 'should have time entries' do
+    @project.should respond_to(:time_entries)
+  end
+  
+  describe 'time entries' do
+    it 'should list time entries based on project ID' do
+      project_id = stub('project ID')
+      @project.stubs(:project_id).returns(project_id)
+      FreshBooks::TimeEntry.expects(:list).with('project_id' => project_id)
+      @project.time_entries
+    end
+    
+    it 'should return found time entries' do
+      time_entries = stub('time entries')
+      project_id = stub('project ID')
+      @project.stubs(:project_id).returns(project_id)
+      FreshBooks::TimeEntry.stubs(:list).with('project_id' => project_id).returns(time_entries)
+      @project.time_entries.should == time_entries
+    end
+  end
 end

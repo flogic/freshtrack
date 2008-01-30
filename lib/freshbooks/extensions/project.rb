@@ -29,5 +29,9 @@ module FreshBooks
     def tasks
       Task.list('project_id' => project_id)
     end
+    
+    def time_entries
+      TimeEntry.list('project_id' => project_id)
+    end
   end
 end
