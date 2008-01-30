@@ -49,6 +49,50 @@ describe FreshBooks::Project do
     end
   end
   
+  describe 'creating an instance' do
+    before :each do
+      @response = stub('response', :success? => nil)
+      FreshBooks.stubs(:call_api).returns(@response)
+    end
+    
+    it 'should issue a request with the instance' do
+      FreshBooks.expects(:call_api).with('project.create', 'project' => @project).returns(@response)
+      @project.create
+    end
+    
+    describe 'with a successful request' do
+      before :each do
+        @project_id = 5
+        @response.stubs(:elements).returns([stub('pre element'), @project_id.to_s, stub('post element')])
+        @response.stubs(:success?).returns(true)
+      end
+      
+      it 'should set the ID from the response' do
+        @project.expects(:project_id=).with(@project_id)
+        @project.create
+      end
+      
+      it 'should return the ID' do
+        @project.create.should == @project_id
+      end
+    end
+    
+    describe 'with an unsuccessful request' do
+      before :each do
+        @response.stubs(:success?).returns(false)
+      end
+      
+      it 'should not set the ID' do
+        @project.expects(:project_id=).never
+        @project.create
+      end
+      
+      it 'should return nil' do
+        @project.create.should be_nil
+      end
+    end
+  end
+  
   describe 'getting an instance' do
     before :each do
       @project_id = 1

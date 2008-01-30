@@ -57,6 +57,50 @@ describe FreshBooks::TimeEntry do
     end
   end
   
+  describe 'creating an instance' do
+    before :each do
+      @response = stub('response', :success? => nil)
+      FreshBooks.stubs(:call_api).returns(@response)
+    end
+    
+    it 'should issue a request with the instance' do
+      FreshBooks.expects(:call_api).with('time_entry.create', 'time_entry' => @time_entry).returns(@response)
+      @time_entry.create
+    end
+    
+    describe 'with a successful request' do
+      before :each do
+        @time_entry_id = 5
+        @response.stubs(:elements).returns([stub('pre element'), @time_entry_id.to_s, stub('post element')])
+        @response.stubs(:success?).returns(true)
+      end
+      
+      it 'should set the ID from the response' do
+        @time_entry.expects(:time_entry_id=).with(@time_entry_id)
+        @time_entry.create
+      end
+      
+      it 'should return the ID' do
+        @time_entry.create.should == @time_entry_id
+      end
+    end
+    
+    describe 'with an unsuccessful request' do
+      before :each do
+        @response.stubs(:success?).returns(false)
+      end
+      
+      it 'should not set the ID' do
+        @time_entry.expects(:time_entry_id=).never
+        @time_entry.create
+      end
+      
+      it 'should return nil' do
+        @time_entry.create.should be_nil
+      end
+    end
+  end
+  
   describe 'getting an instance' do
     before :each do
       @time_entry_id = 1

@@ -22,6 +22,13 @@ module FreshBooks
       end
     end
     
+    def create
+      resp = FreshBooks.call_api('project.create', 'project' => self)
+      if resp.success?
+        self.project_id = resp.elements[1].to_i
+      end
+    end
+    
     def client
       Client.get(client_id)
     end

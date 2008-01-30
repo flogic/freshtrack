@@ -21,6 +21,13 @@ module FreshBooks
       end
     end
     
+    def create
+      resp = FreshBooks.call_api('time_entry.create', 'time_entry' => self)
+      if resp.success?
+        self.time_entry_id = resp.elements[1].to_i
+      end
+    end
+    
     def task
       Task.get(task_id)
     end
