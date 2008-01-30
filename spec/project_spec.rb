@@ -143,10 +143,6 @@ describe FreshBooks::Project do
     end
   end
   
-  def get_by_name(name)
-    list.detect { |p|  p.name == name }
-  end
-  
   describe 'getting by name' do
     before :each do
       @name = 'projname'
