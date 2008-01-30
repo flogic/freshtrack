@@ -1,5 +1,6 @@
 $:.unshift File.dirname(__FILE__)
 require 'freshbooks/extensions'
+require 'freshtrack/core_ext'
 require 'yaml'
 
 module Freshtrack
@@ -33,6 +34,24 @@ module Freshtrack
       raise unless @project
       @task = FreshBooks::Task.find_by_name(mapping[:task])
       raise unless @task
+    end
+    
+    def get_time_data(project_name)
+      time_data =IO.read("| punch list #{project_name}")
+      convert_time_data(time_data)
+    end
+    
+    def convert_time_data(time_data)
+      raw = YAML.load(time_data)
+      condense_time_data(raw)
+    end
+    
+    def condense_time_data(time_data)
+    end
+    
+    def get_data(project_name)
+      get_project_data(project_name)
+      get_time_data(project_name)
     end
   end
 end

@@ -7,6 +7,10 @@ config/hoe.rb
 config/requirements.rb
 lib/freshtrack.rb
 lib/freshtrack/version.rb
+lib/freshtrack/core_ext.rb
+lib/freshtrack/core_ext/array.rb
+lib/freshtrack/core_ext/numeric.rb
+lib/freshtrack/core_ext/time.rb
 lib/freshbooks/extensions.rb
 lib/freshbooks/extensions/base_object.rb
 lib/freshbooks/extensions/project.rb
@@ -21,6 +25,9 @@ spec/freshtrack_spec.rb
 spec/project_spec.rb
 spec/task_spec.rb
 spec/time_entry_spec.rb
+spec/array_spec.rb
+spec/numeric_spec.rb
+spec/time_spec.rb
 spec/spec.opts
 spec/spec_helper.rb
 tasks/deployment.rake
