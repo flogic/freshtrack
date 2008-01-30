@@ -11,8 +11,8 @@ module FreshBooks
         new_from_xml(resp.elements[1])
       end
       
-      def list
-        resp = FreshBooks.call_api('task.list')
+      def list(options = {})
+        resp = FreshBooks.call_api('task.list', options)
         return nil unless resp.success?
         resp.elements.collect { |elem|  new_from_xml(elem) }
       end

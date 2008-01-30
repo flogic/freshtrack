@@ -25,5 +25,9 @@ module FreshBooks
     def client
       Client.get(client_id)
     end
+    
+    def tasks
+      Task.list('project_id' => project_id)
+    end
   end
 end

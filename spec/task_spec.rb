@@ -98,9 +98,23 @@ describe FreshBooks::Task do
       FreshBooks.stubs(:call_api).returns(@response)
     end
     
-    it 'should issue a request for the task list ID' do
-      FreshBooks.expects(:call_api).with('task.list').returns(@response)
+    it 'should not require an argument' do
+      lambda { FreshBooks::Task.list }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should accept an argument' do
+      lambda { FreshBooks::Task.list('arg') }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should issue a request for the task list' do
+      FreshBooks.expects(:call_api).with('task.list', {}).returns(@response)
       FreshBooks::Task.list
+    end
+    
+    it 'should pass the argument to the request' do
+      arg = stub('arg')
+      FreshBooks.expects(:call_api).with('task.list', arg).returns(@response)
+      FreshBooks::Task.list(arg)
     end
     
     describe 'with a successful request' do

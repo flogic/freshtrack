@@ -106,7 +106,7 @@ describe FreshBooks::Project do
       FreshBooks.stubs(:call_api).returns(@response)
     end
     
-    it 'should issue a request for the project list ID' do
+    it 'should issue a request for the project list' do
       FreshBooks.expects(:call_api).with('project.list').returns(@response)
       FreshBooks::Project.list
     end
@@ -197,6 +197,27 @@ describe FreshBooks::Project do
       @project.stubs(:client_id).returns(client_id)
       FreshBooks::Client.stubs(:get).with(client_id).returns(client)
       @project.client.should == client
+    end
+  end
+  
+  it 'should have tasks' do
+    @project.should respond_to(:tasks)
+  end
+  
+  describe 'tasks' do
+    it 'should list tasks based on project ID' do
+      project_id = stub('project ID')
+      @project.stubs(:project_id).returns(project_id)
+      FreshBooks::Task.expects(:list).with('project_id' => project_id)
+      @project.tasks
+    end
+    
+    it 'should return found tasks' do
+      tasks = stub('tasks')
+      project_id = stub('project ID')
+      @project.stubs(:project_id).returns(project_id)
+      FreshBooks::Task.stubs(:list).with('project_id' => project_id).returns(tasks)
+      @project.tasks.should == tasks
     end
   end
 end
