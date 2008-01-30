@@ -11,6 +11,7 @@ lib/freshbooks/extensions.rb
 lib/freshbooks/extensions/base_object.rb
 lib/freshbooks/extensions/project.rb
 lib/freshbooks/extensions/task.rb
+lib/freshbooks/extensions/time_entry.rb
 log/debug.log
 script/destroy
 script/generate
@@ -19,6 +20,7 @@ spec/base_object_spec.rb
 spec/freshtrack_spec.rb
 spec/project_spec.rb
 spec/task_spec.rb
+spec/time_entry_spec.rb
 spec/spec.opts
 spec/spec_helper.rb
 tasks/deployment.rake
