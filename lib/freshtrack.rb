@@ -37,7 +37,7 @@ module Freshtrack
     end
     
     def get_time_data(project_name)
-      time_data =IO.read("| punch list #{project_name}")
+      time_data = IO.read("| punch list #{project_name}")
       convert_time_data(time_data)
     end
     
@@ -47,6 +47,17 @@ module Freshtrack
     end
     
     def condense_time_data(time_data)
+      times_to_dates(time_data)
+    end
+    
+    def times_to_dates(time_data)
+      time_data.each do |td|
+        punch_in  = td.delete('in')
+        punch_out = td.delete('out')
+        
+        td['date']  = punch_in.to_date
+        td['hours'] = (punch_out - punch_in).secs_to_hours
+      end
     end
     
     def get_data(project_name)

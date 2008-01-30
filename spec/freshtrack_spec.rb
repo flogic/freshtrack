@@ -170,6 +170,7 @@ describe Freshtrack do
     before :each do
       @time_data = stub('time data')
       YAML.stubs(:load)
+      Freshtrack.stubs(:condense_time_data)
     end
     
     it 'should require an argument' do
@@ -200,6 +201,11 @@ describe Freshtrack do
   end
   
   describe 'condensing time data' do
+    before :each do
+      @time_data = stub('time data')
+      Freshtrack.stubs(:times_to_dates)
+    end
+    
     it 'should require an argument' do
       lambda { Freshtrack.condense_time_data }.should raise_error(ArgumentError)
     end
@@ -209,6 +215,64 @@ describe Freshtrack do
     end
     
     it 'should convert times to dates and hour differences' do
+      Freshtrack.expects(:times_to_dates).with(@time_data)
+      Freshtrack.condense_time_data(@time_data)
+    end
+  end
+  
+  describe 'converting times to dates and hour differences' do
+    before :each do
+      @time_data = []
+    end
+    
+    it 'should require an argument' do
+      lambda { Freshtrack.times_to_dates }.should raise_error(ArgumentError)
+    end
+    
+    it 'should accept an argument' do
+      lambda { Freshtrack.times_to_dates(@time_data) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should return an array' do
+      Freshtrack.times_to_dates(@time_data).should be_kind_of(Array)
+    end
+    
+    it 'should replace the in/out time data with a single date' do
+      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 25, 7,  25, 0) })
+      result = Freshtrack.times_to_dates(@time_data)
+      result = result.first
+      
+      result.should     have_key('date')
+      result.should_not have_key('in')
+      result.should_not have_key('out')
+    end
+    
+    it 'should make the date appopriate to the time' do
+      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 25, 7,  25, 0) })
+      result = Freshtrack.times_to_dates(@time_data)
+      result = result.first
+      result['date'].should == Date.civil(2008, 1, 25)
+    end
+    
+    it 'should use the in time date' do
+      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 26, 7,  25, 0) })
+      result = Freshtrack.times_to_dates(@time_data)
+      result = result.first
+      result['date'].should == Date.civil(2008, 1, 25)
+    end
+    
+    it 'should add hour data' do
+      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 25, 7,  25, 0) })
+      result = Freshtrack.times_to_dates(@time_data)
+      result = result.first
+      result.should have_key('hours')
+    end
+    
+    it 'should make the hour data appropriate to the in/out difference' do
+      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 25, 7,  55, 0) })
+      result = Freshtrack.times_to_dates(@time_data)
+      result = result.first
+      result['hours'].should == 1.5
     end
   end
   
