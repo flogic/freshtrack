@@ -204,6 +204,7 @@ describe Freshtrack do
     before :each do
       @time_data = stub('time data')
       Freshtrack.stubs(:times_to_dates)
+      Freshtrack.stubs(:group_date_data)
     end
     
     it 'should require an argument' do
@@ -217,6 +218,19 @@ describe Freshtrack do
     it 'should convert times to dates and hour differences' do
       Freshtrack.expects(:times_to_dates).with(@time_data)
       Freshtrack.condense_time_data(@time_data)
+    end
+    
+    it 'should group date and hour differences' do
+      date_hour_data = stub('date/hour data')
+      Freshtrack.stubs(:times_to_dates).returns(date_hour_data)
+      Freshtrack.expects(:group_date_data).with(date_hour_data)
+      Freshtrack.condense_time_data(@time_data)
+    end
+    
+    it 'should return the grouped date/hour data' do
+      grouped_dates = stub('grouped date/hour data')
+      Freshtrack.stubs(:group_date_data).returns(grouped_dates)
+      Freshtrack.condense_time_data(@time_data).should == grouped_dates
     end
   end
   
@@ -273,6 +287,71 @@ describe Freshtrack do
       result = Freshtrack.times_to_dates(@time_data)
       result = result.first
       result['hours'].should == 1.5
+    end
+  end
+  
+  describe 'grouping date data' do
+    before :each do
+      @date_data = []
+    end
+    
+    it 'should require an argument' do
+      lambda { Freshtrack.group_date_data }.should raise_error(ArgumentError)
+    end
+    
+    it 'should accept an argument' do
+      lambda { Freshtrack.group_date_data(@date_data) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should return an array' do
+      Freshtrack.group_date_data(@date_data).should be_kind_of(Array)
+    end
+    
+    it 'should group the data by date' do
+      today = Date.today
+      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => [] })
+      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => [] })
+      @date_data.push({ 'date' => today + 1, 'hours' => 0, 'log' => [] })
+      Freshtrack.group_date_data(@date_data).collect { |x|  x['date'] }.should == [today, today + 1]
+    end
+    
+    it 'should return the array sorted by date' do
+      today = Date.today
+      @date_data.push({ 'date' => today + 1, 'hours' => 0, 'log' => [] })
+      @date_data.push({ 'date' => today - 1, 'hours' => 0, 'log' => [] })
+      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => [] })
+      @date_data.push({ 'date' => today + 1, 'hours' => 0, 'log' => [] })
+      Freshtrack.group_date_data(@date_data).collect { |x|  x['date'] }.should == [today - 1, today, today + 1]
+    end
+    
+    it 'should add the hours for a particular date' do
+      today = Date.today
+      @date_data.push({ 'date' => today,     'hours' => 1, 'log' => [] })
+      @date_data.push({ 'date' => today,     'hours' => 3, 'log' => [] })
+      @date_data.push({ 'date' => today + 1, 'hours' => 2, 'log' => [] })
+      result = Freshtrack.group_date_data(@date_data)
+      
+      result[0]['date'].should  == today
+      result[0]['hours'].should == 4
+      
+      result[1]['date'].should  == today + 1
+      result[1]['hours'].should == 2
+    end
+    
+    it 'should join the log into notes' do
+      today = Date.today
+      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => ['punch in 1', 'punch out 1'] })
+      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => ['punch in 2', 'punch out 2'] })
+      @date_data.push({ 'date' => today + 1, 'hours' => 0, 'log' => ['punch in 3', 'punch out 3'] })
+      result = Freshtrack.group_date_data(@date_data)
+      
+      result[0]['date'].should  == today
+      result[0]['notes'].should == "punch in 1\npunch out 1\n--------------------\npunch in 2\npunch out 2"
+      result[0].should_not have_key('log')
+      
+      result[1]['date'].should  == today + 1
+      result[1]['notes'].should == "punch in 3\npunch out 3"
+      result[1].should_not have_key('log')
     end
   end
   
