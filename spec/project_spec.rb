@@ -229,7 +229,7 @@ describe FreshBooks::Project do
       end
     end
     
-    describe 'with an unsuccessful request' do      
+    describe 'with an unsuccessful request' do
       before :each do
         @response.stubs(:success?).returns(false)
       end
@@ -288,7 +288,7 @@ describe FreshBooks::Project do
       end
     end
     
-    describe 'with an unsuccessful request' do      
+    describe 'with an unsuccessful request' do
       before :each do
         @response.stubs(:success?).returns(false)
       end

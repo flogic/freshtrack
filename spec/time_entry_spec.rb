@@ -237,7 +237,7 @@ describe FreshBooks::TimeEntry do
       end
     end
     
-    describe 'with an unsuccessful request' do      
+    describe 'with an unsuccessful request' do
       before :each do
         @response.stubs(:success?).returns(false)
       end
@@ -296,7 +296,7 @@ describe FreshBooks::TimeEntry do
       end
     end
     
-    describe 'with an unsuccessful request' do      
+    describe 'with an unsuccessful request' do
       before :each do
         @response.stubs(:success?).returns(false)
       end

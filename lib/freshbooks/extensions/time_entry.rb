@@ -45,7 +45,7 @@ module FreshBooks
     def task
       Task.get(task_id)
     end
-        
+    
     def project
       Project.get(project_id)
     end
