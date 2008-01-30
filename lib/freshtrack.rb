@@ -67,6 +67,7 @@ module Freshtrack
       grouped.sort.inject([]) do |arr, (date, data)|
         this_date = { 'date' => date }
         this_date['hours'] = data.inject(0) { |sum, x|  sum + x['hours'] }
+        this_date['hours'] = ('%.2f' % this_date['hours']).to_f
         this_date['notes'] = data.collect { |x|  x['log'].join("\n") }.join("\n" + separator + "\n")
         arr + [this_date]
       end

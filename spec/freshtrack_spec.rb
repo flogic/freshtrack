@@ -338,6 +338,15 @@ describe Freshtrack do
       result[1]['hours'].should == 2
     end
     
+    it 'should round the hours to two decimal places' do
+      today = Date.today
+      @date_data.push({ 'date' => today, 'hours' => 1.666666666, 'log' => [] })
+      result = Freshtrack.group_date_data(@date_data)
+      
+      result[0]['date'].should  == today
+      result[0]['hours'].should == 1.67
+    end
+    
     it 'should join the log into notes' do
       today = Date.today
       @date_data.push({ 'date' => today,     'hours' => 0, 'log' => ['punch in 1', 'punch out 1'] })
