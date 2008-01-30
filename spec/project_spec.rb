@@ -1,0 +1,206 @@
+require File.dirname(__FILE__) + '/spec_helper.rb'
+
+describe FreshBooks::Project do
+  before :each do
+    @project = FreshBooks::Project.new
+  end
+  
+  describe 'attributes' do
+    it 'should have a project_id' do
+      @project.should respond_to(:project_id)
+    end
+    
+    it 'should have a name' do
+      @project.should respond_to(:name)
+    end
+    
+    it 'should have a bill_method' do
+      @project.should respond_to(:bill_method)
+    end
+    
+    it 'should have a client_id' do
+      @project.should respond_to(:client_id)
+    end
+    
+    it 'should have a rate' do
+      @project.should respond_to(:rate)
+    end
+    
+    it 'should have a description' do
+      @project.should respond_to(:description)
+    end
+  end
+  
+  describe 'type mappings' do
+    before :each do
+      @mapping = FreshBooks::Project::TYPE_MAPPINGS
+    end
+    
+    it 'should map project_id to Fixnum' do
+      @mapping['project_id'].should == Fixnum
+    end
+    
+    it 'should map client_id to Fixnum' do
+      @mapping['client_id'].should == Fixnum
+    end
+    
+    it 'should map rate to Float' do
+      @mapping['rate'].should == Float
+    end
+  end
+  
+  describe 'getting an instance' do
+    before :each do
+      @project_id = 1
+      @element = stub('element')
+      @response = stub('response', :elements => [stub('pre element'), @element, stub('post element')], :success? => nil)
+      FreshBooks.stubs(:call_api).returns(@response)
+    end
+    
+    it 'should require an argument' do
+      lambda { FreshBooks::Project.get }.should raise_error(ArgumentError)
+    end
+    
+    it 'should accept an argument' do
+      lambda { FreshBooks::Project.get(@project_id) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should issue a request for the supplied ID' do
+      FreshBooks.expects(:call_api).with('project.get', 'project_id' => @project_id).returns(@response)
+      FreshBooks::Project.get(@project_id)
+    end
+    
+    describe 'with a successful request' do
+      before :each do
+        @response.stubs(:success?).returns(true)
+      end
+      
+      it 'should instantiate a new project instance from the request' do
+        FreshBooks::Project.expects(:new_from_xml).with(@element)
+        FreshBooks::Project.get(@project_id)
+      end
+      
+      it 'should return the project instance' do
+        val = stub('return val')
+        FreshBooks::Project.stubs(:new_from_xml).returns(val)
+        FreshBooks::Project.get(@project_id).should == val
+      end
+    end
+    
+    describe 'with an unsuccessful request' do      
+      before :each do
+        @response.stubs(:success?).returns(false)
+      end
+      
+      it 'should return nil' do
+        FreshBooks::Project.get(@project_id).should be_nil
+      end
+    end
+  end
+  
+  describe 'getting a list' do
+    before :each do
+      @project_id = 1
+      @elements = Array.new(3) { stub('element') }
+      @response = stub('response', :elements => @elements, :success? => nil)
+      FreshBooks.stubs(:call_api).returns(@response)
+    end
+    
+    it 'should issue a request for the project list ID' do
+      FreshBooks.expects(:call_api).with('project.list').returns(@response)
+      FreshBooks::Project.list
+    end
+    
+    describe 'with a successful request' do
+      before :each do
+        @response.stubs(:success?).returns(true)
+      end
+      
+      it 'should instantiate new project instances from the request' do
+        @elements.each do |element|
+          FreshBooks::Project.expects(:new_from_xml).with(element)
+        end
+        FreshBooks::Project.list
+      end
+      
+      it 'should return the project instances' do
+        vals = Array.new(@elements.length) { stub('return val') }
+        @elements.each_with_index do |element, i|
+          FreshBooks::Project.stubs(:new_from_xml).with(element).returns(vals[i])
+        end
+        FreshBooks::Project.list.should == vals
+      end
+    end
+    
+    describe 'with an unsuccessful request' do      
+      before :each do
+        @response.stubs(:success?).returns(false)
+      end
+      
+      it 'should return nil' do
+        FreshBooks::Project.list.should be_nil
+      end
+    end
+  end
+  
+  def get_by_name(name)
+    list.detect { |p|  p.name == name }
+  end
+  
+  describe 'getting by name' do
+    before :each do
+      @name = 'projname'
+      FreshBooks::Project.stubs(:list).returns([])
+    end
+    
+    it 'should require an argument' do
+      lambda { FreshBooks::Project.find_by_name }.should raise_error(ArgumentError)
+    end
+    
+    it 'should accept an argument' do
+      lambda { FreshBooks::Project.find_by_name(@name) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should return the project with a matching name' do
+      projects = Array.new(3) { |i| stub('project', :name => "project #{i}" ) }
+      projects[1,0] = expected = stub('project', :name => @name)
+      FreshBooks::Project.stubs(:list).returns(projects)
+      FreshBooks::Project.find_by_name(@name).should == expected
+    end
+    
+    it 'should return the first project found whose name matches' do
+      projects = Array.new(3) { |i| stub('project', :name => "project #{i}" ) }
+      projects[1,0] = expected = stub('project', :name => @name)
+      projects[3,0] = stub('project', :name => @name)
+      FreshBooks::Project.stubs(:list).returns(projects)
+      FreshBooks::Project.find_by_name(@name).should == expected
+    end
+    
+    it 'should return nil if no project with matching name found' do
+      projects = Array.new(3) { |i| stub('project', :name => "project #{i}" ) }
+      FreshBooks::Project.stubs(:list).returns(projects)
+      FreshBooks::Project.find_by_name(@name).should be_nil
+    end
+  end
+  
+  it 'should have a client' do
+    @project.should respond_to(:client)
+  end
+  
+  describe 'client' do
+    it 'should find client based on client_id' do
+      client_id = stub('client ID')
+      @project.stubs(:client_id).returns(client_id)
+      FreshBooks::Client.expects(:get).with(client_id)
+      @project.client
+    end
+    
+    it 'should return found client' do
+      client = stub('client')
+      client_id = stub('client ID')
+      @project.stubs(:client_id).returns(client_id)
+      FreshBooks::Client.stubs(:get).with(client_id).returns(client)
+      @project.client.should == client
+    end
+  end
+end
