@@ -388,5 +388,134 @@ describe Freshtrack do
       Freshtrack.expects(:get_time_data).with(@project_name)
       Freshtrack.get_data(@project_name)
     end
+    
+    it 'should return time data' do
+      time_data = stub('time data')
+      Freshtrack.stubs(:get_time_data).returns(time_data)
+      Freshtrack.get_data(@project_name).should == time_data
+    end
+  end
+  
+  describe 'tracking time' do
+    before :each do
+      @project_name = :proj
+      @data = []
+      Freshtrack.stubs(:get_data).returns(@data)
+    end
+    
+    it 'should require an argument' do
+      lambda { Freshtrack.track }.should raise_error(ArgumentError)
+    end
+    
+    it 'should accept an argument' do
+      lambda { Freshtrack.track(@project_name) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should get data for supplied project' do
+      Freshtrack.expects(:get_data).with(@project_name).returns(@data)
+      Freshtrack.track(@project_name)
+    end
+    
+    it 'should create entries for project data' do
+      2.times do
+        ent = stub('entry data')
+        @data.push(ent)
+        Freshtrack.expects(:create_entry).with(ent)
+      end
+      Freshtrack.track(@project_name)
+    end
+  end
+  
+  describe 'creating an entry' do
+    before :each do
+      @date = Date.today - 3
+      @hours = 5.67
+      @notes = 'notes for the time entry'
+      @entry_data = { 'date' => @date, 'hours' => @hours, 'notes' => @notes }
+      @time_entry = stub('time entry', :project_id= => nil, :task_id= => nil, :date= => nil, :hours= => nil, :notes= => nil, :create => true)
+      FreshBooks::TimeEntry.stubs(:new).returns(@time_entry)
+      
+      @project = stub('project', :project_id => stub('project id'))
+      @task    = stub('task',    :task_id    => stub('task id'))
+      Freshtrack.stubs(:project).returns(@project)
+      Freshtrack.stubs(:task).returns(@task)
+      
+      STDERR.stubs(:puts)
+    end
+    
+    it 'should require an argument' do
+      lambda { Freshtrack.create_entry }.should raise_error(ArgumentError)
+    end
+    
+    it 'should accept an argument' do
+      lambda { Freshtrack.create_entry(@entry_data) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should instantiate a new time entry' do
+      FreshBooks::TimeEntry.expects(:new).returns(@time_entry)
+      Freshtrack.create_entry(@entry_data)
+    end
+    
+    describe 'with the time entry instance' do
+      it 'should set the project' do
+        @time_entry.expects(:project_id=).with(@project.project_id)
+        Freshtrack.create_entry(@entry_data)
+      end
+      
+      it 'should set the task' do
+        @time_entry.expects(:task_id=).with(@task.task_id)
+        Freshtrack.create_entry(@entry_data)
+      end
+      
+      it 'should set the date' do
+        @time_entry.expects(:date=).with(@date)
+        Freshtrack.create_entry(@entry_data)
+      end
+      
+      it 'should set the hours' do
+        @time_entry.expects(:hours=).with(@hours)
+        Freshtrack.create_entry(@entry_data)
+      end
+      
+      it 'should set the notes' do
+        @time_entry.expects(:notes=).with(@notes)
+        Freshtrack.create_entry(@entry_data)
+      end
+    end
+    
+    it 'should create the time entry' do
+      @time_entry.expects(:create)
+      Freshtrack.create_entry(@entry_data)
+    end
+    
+    describe 'successfully' do
+      before :each do
+        @time_entry.stubs(:create).returns(5)
+      end
+      
+      it 'should be silent' do
+        STDERR.expects(:puts).never
+        Freshtrack.create_entry(@entry_data)
+      end
+      
+      it 'should return true' do
+        Freshtrack.create_entry(@entry_data).should be(true)
+      end
+    end
+    
+    describe 'unsuccessfully' do
+      before :each do
+        @time_entry.stubs(:create).returns(nil)
+      end
+      
+      it 'should output an indication' do
+        STDERR.expects(:puts).with(regexp_matches(/#{@date.to_s}/))
+        Freshtrack.create_entry(@entry_data)
+      end
+      
+      it 'should return nil' do
+        Freshtrack.create_entry(@entry_data).should be_nil
+      end
+    end
   end
 end

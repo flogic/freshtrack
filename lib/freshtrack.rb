@@ -77,5 +77,31 @@ module Freshtrack
       get_project_data(project_name)
       get_time_data(project_name)
     end
+    
+    def track(project_name)
+      data = get_data(project_name)
+      data.each do |entry_data|
+        create_entry(entry_data)
+      end
+    end
+    
+    def create_entry(entry_data)
+      time_entry = FreshBooks::TimeEntry.new
+      
+      time_entry.project_id = project.project_id
+      time_entry.task_id    = task.task_id
+      time_entry.date       = entry_data['date']
+      time_entry.hours      = entry_data['hours']
+      time_entry.notes      = entry_data['notes']
+      
+      result = time_entry.create
+      
+      if result
+        true
+      else
+        STDERR.puts "warning: unsuccessful time entry creation for date #{entry_data['date']}"
+        nil
+      end
+    end
   end
 end
