@@ -36,8 +36,8 @@ module Freshtrack
       raise unless @task
     end
     
-    def get_time_data(project_name)
-      time_data = IO.read("| punch list #{project_name}")
+    def get_time_data(project_name, options = '')
+      time_data = IO.read("| punch list #{project_name} #{options}")
       convert_time_data(time_data)
     end
     
@@ -73,9 +73,9 @@ module Freshtrack
       end
     end
     
-    def get_data(project_name)
+    def get_data(project_name, options = '')
       get_project_data(project_name)
-      get_time_data(project_name)
+      get_time_data(project_name, options)
     end
     
     def track(project_name)

@@ -144,13 +144,28 @@ describe Freshtrack do
       lambda { Freshtrack.get_time_data(@project_name) }.should_not raise_error(ArgumentError)
     end
     
+    it 'should accept an option string' do
+      lambda { Freshtrack.get_time_data(@project_name, 'option string') }.should_not raise_error(ArgumentError)
+    end
+    
     it 'should get the time data (from punch)' do
       IO.expects(:read).with(regexp_matches(/^\| punch list\b/))
       Freshtrack.get_time_data(@project_name)
     end
     
     it 'should pass the supplied project when getting the time data' do
-      IO.expects(:read).with(regexp_matches(/\b#{@project_name}$/))
+      IO.expects(:read).with(regexp_matches(/\b#{@project_name}\b/))
+      Freshtrack.get_time_data(@project_name)
+    end
+    
+    it 'should pass the supplied option string on when getting the time data' do
+      options = 'options go here'
+      IO.expects(:read).with(regexp_matches(/\b#{@project_name} #{options}\b/))
+      Freshtrack.get_time_data(@project_name, options)
+    end
+    
+    it 'should default option string to empty string' do
+      IO.expects(:read).with(regexp_matches(/\b#{@project_name} $/))
       Freshtrack.get_time_data(@project_name)
     end
     
@@ -163,7 +178,7 @@ describe Freshtrack do
       converted = stub('converted time data')
       Freshtrack.stubs(:convert_time_data).returns(converted)
       Freshtrack.get_time_data(@project_name).should == converted
-    end    
+    end
   end
   
   describe 'converting time data' do
@@ -379,13 +394,28 @@ describe Freshtrack do
       lambda { Freshtrack.get_data(@project_name) }.should_not raise_error(ArgumentError)
     end
     
+    it 'should accept an option string' do
+      lambda { Freshtrack.get_data(@project_name, 'option string') }.should_not raise_error(ArgumentError)
+    end
+    
     it 'should get project data for supplied project' do
       Freshtrack.expects(:get_project_data).with(@project_name)
       Freshtrack.get_data(@project_name)
     end
     
     it 'should get time data for supplied project' do
-      Freshtrack.expects(:get_time_data).with(@project_name)
+      Freshtrack.expects(:get_time_data).with(@project_name, anything)
+      Freshtrack.get_data(@project_name)
+    end
+    
+    it 'should pass option string on when getting time data' do
+      options = 'here be options'
+      Freshtrack.expects(:get_time_data).with(@project_name, options)
+      Freshtrack.get_data(@project_name, options)
+    end
+    
+    it 'should default option string to empty string' do
+      Freshtrack.expects(:get_time_data).with(@project_name, '')
       Freshtrack.get_data(@project_name)
     end
     
