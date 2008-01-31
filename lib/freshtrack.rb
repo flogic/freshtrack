@@ -78,8 +78,8 @@ module Freshtrack
       get_time_data(project_name, options)
     end
     
-    def track(project_name)
-      data = get_data(project_name)
+    def track(project_name, options = '')
+      data = get_data(project_name, options)
       data.each do |entry_data|
         create_entry(entry_data)
       end
