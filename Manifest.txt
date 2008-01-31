@@ -3,6 +3,7 @@ License.txt
 Manifest.txt
 README.txt
 Rakefile
+bin/freshtrack
 config/hoe.rb
 config/requirements.rb
 lib/freshtrack.rb
