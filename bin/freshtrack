@@ -11,35 +11,13 @@ end
 
 require 'freshtrack'
 
-# NOTE: the option -p/--path= is given as an example, and should probably be replaced in your application.
-
-OPTIONS = {}
-MANDATORY_OPTIONS = %w[]
-
-parser = OptionParser.new do |opts|
-  opts.banner = <<BANNER
-Usage: #{File.basename($0)} [filename]
-
-Options are:
-BANNER
-  opts.separator ''
-  opts.on('-v', '--version',
-          "Show the #{File.basename($0)} version number and exit") { puts "#{File.basename($0)} #{Freshtrack::VERSION::STRING}"; exit }
-  opts.on('-h', '--help',
-          'Show this help message.') { puts opts; exit }
-  opts.parse!(ARGV)
-
-  if MANDATORY_OPTIONS && MANDATORY_OPTIONS.find { |option| OPTIONS[option.to_sym].nil? }
-    puts opts; exit
-  end
-end
-
 # do stuff
-project = ARGV[0]
+project = ARGV.shift
 
 unless project
   puts "Usage: #{File.basename($0)} [project] [options]"
   exit
 end
 
-Freshtrack.track(*ARGV)
+Freshtrack.init
+Freshtrack.track(project, ARGV.join(' '))
