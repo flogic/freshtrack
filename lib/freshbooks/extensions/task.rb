@@ -14,7 +14,8 @@ module FreshBooks
       def list(options = {})
         resp = FreshBooks.call_api('task.list', options)
         return nil unless resp.success?
-        resp.elements.collect { |elem|  new_from_xml(elem) }
+        list_elements = resp.elements[1].elements
+        list_elements.collect { |elem|  new_from_xml(elem) }
       end
       
       def find_by_name(name)

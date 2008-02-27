@@ -235,8 +235,8 @@ describe FreshBooks::Task do
   describe 'getting a list' do
     before :each do
       @task_id = 1
-      @elements = Array.new(3) { stub('element') }
-      @response = stub('response', :elements => @elements, :success? => nil)
+      @elements = Array.new(3) { stub('list element') }
+      @response = stub('response', :elements => [stub('pre element'), stub('element', :elements => @elements), stub('post element')], :success? => nil)
       FreshBooks.stubs(:call_api).returns(@response)
     end
     
