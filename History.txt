@@ -2,3 +2,8 @@
 
 * 1 major enhancement:
   * Initial release
+
+== 0.2.1 2008-02-27
+
+* 1 major enhancement:
+  * Update to use API 2.1
