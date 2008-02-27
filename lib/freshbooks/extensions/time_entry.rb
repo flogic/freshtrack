@@ -17,7 +17,8 @@ module FreshBooks
       def list(options = {})
         resp = FreshBooks.call_api('time_entry.list', options)
         return nil unless resp.success?
-        resp.elements.collect { |elem|  new_from_xml(elem) }
+        list_elements = resp.elements[1].elements
+        list_elements.collect { |elem|  new_from_xml(elem) }
       end
       
       def delete(time_entry_id)
