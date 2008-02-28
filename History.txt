@@ -1,9 +1,14 @@
-== 0.2.0 2008-01-30
+== 0.2.2 2008-02-27
 
-* 1 major enhancement:
-  * Initial release
+* 1 tiny enhancement:
+  * Re-packaging and re-releasing to get around my stupidity, forgetting to update the gemspec and thinking I could delete the release on rubyforge and release 0.2.1 again.
 
 == 0.2.1 2008-02-27
 
 * 1 major enhancement:
   * Update to use API 2.1
+
+== 0.2.0 2008-01-30
+
+* 1 major enhancement:
+  * Initial release
