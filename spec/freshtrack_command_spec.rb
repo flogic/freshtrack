@@ -44,8 +44,31 @@ describe 'freshtrack command' do
     run_command(@project)
   end
   
-  it 'should pass arguments on when tracking time' do
-    Freshtrack.expects(:track).with(anything, '--after 2008-08-26')
-    run_command(@project, '--after', '2008-08-26')
+  describe 'when options specified' do
+    it "should pass on an 'after' time option given by --after" do
+      time_option = '2008-08-26 09:47'
+      time = Time.local(2008, 8, 26, 9, 47)
+      Freshtrack.expects(:track).with(@project, has_entry(:after => time))
+      run_command(@project, '--after', time_option)
+    end
+
+    it "should pass on a 'before' time option given by --before" do
+      time_option = '2008-08-23 15:39'
+      time = Time.local(2008, 8, 23, 15, 39)
+      Freshtrack.expects(:track).with(@project, has_entry(:before => time))
+      run_command(@project, '--before', time_option)
+    end
+
+    it 'should handle a time option given as a date' do
+      time_option = '2008-08-23'
+      time = Time.local(2008, 8, 23)
+      Freshtrack.expects(:track).with(@project, has_entry(:before => time))
+      run_command(@project, '--before', time_option)
+    end
+  end
+  
+  it 'should pass no options if none specified' do
+    Freshtrack.expects(:track).with(@project, {})
+    run_command(@project)
   end
 end

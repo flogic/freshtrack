@@ -10,8 +10,36 @@ rescue LoadError
 end
 
 require 'freshtrack'
+require 'optparse'
+require 'time'
 
-# do stuff
+OPTIONS = {}
+MANDATORY_OPTIONS = %w[]
+
+parser = OptionParser.new do |opts|
+  opts.banner = <<BANNER
+This application is wonderful because...
+
+Usage: #{File.basename($0)} [options]
+
+Options are:
+BANNER
+  opts.separator ''
+  opts.on('-v', '--version',
+          "Show the #{File.basename($0)} version number and exit") { require 'freshtrack/version'; puts "#{File.basename($0)} #{Freshtrack::VERSION::STRING}"; exit  }
+  opts.on('--after [TIME]', String,
+          "Restrict command to only after the given time") { |time|  OPTIONS[:after] = Time.parse(time) }
+  opts.on('--before [TIME]', String,
+          "Restrict command to only before the given time") { |time|  OPTIONS[:before] = Time.parse(time) }
+  opts.on("-h", "--help",
+          "Show this help message.") { puts opts; exit }
+  opts.parse!(ARGV)
+
+  if MANDATORY_OPTIONS && MANDATORY_OPTIONS.find { |option| OPTIONS[option.to_sym].nil? }
+    puts opts; exit
+  end
+end
+
 project = ARGV.shift
 
 unless project
@@ -20,4 +48,4 @@ unless project
 end
 
 Freshtrack.init
-Freshtrack.track(project, ARGV.join(' '))
+Freshtrack.track(project, OPTIONS)
