@@ -415,8 +415,8 @@ describe Freshtrack do
       lambda { Freshtrack.track(@project_name) }.should_not raise_error(ArgumentError)
     end
     
-    it 'should accept an option string' do
-      lambda { Freshtrack.track(@project_name, 'option string') }.should_not raise_error(ArgumentError)
+    it 'should accept options' do
+      lambda { Freshtrack.track(@project_name, :before => Time.now) }.should_not raise_error(ArgumentError)
     end
     
     it 'should get data for supplied project' do
@@ -424,14 +424,14 @@ describe Freshtrack do
       Freshtrack.track(@project_name)
     end
     
-    it 'should pass option string on when getting data' do
-      options = 'here be options'
+    it 'should pass options on when getting data' do
+      options = { :after => Time.now - 12345 }
       Freshtrack.expects(:get_data).with(@project_name, options).returns(@data)
       Freshtrack.track(@project_name, options)
     end
     
-    it 'should default option string to empty string' do
-      Freshtrack.expects(:get_data).with(@project_name, '').returns(@data)
+    it 'should default options to an empty hash' do
+      Freshtrack.expects(:get_data).with(@project_name, {}).returns(@data)
       Freshtrack.track(@project_name)
     end
     
