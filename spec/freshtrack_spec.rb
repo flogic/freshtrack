@@ -145,8 +145,8 @@ describe Freshtrack do
       lambda { Freshtrack.get_time_data(@project_name) }.should_not raise_error(ArgumentError)
     end
     
-    it 'should accept an option string' do
-      lambda { Freshtrack.get_time_data(@project_name, 'option string') }.should_not raise_error(ArgumentError)
+    it 'should accept options' do
+      lambda { Freshtrack.get_time_data(@project_name, :after => Time.now) }.should_not raise_error(ArgumentError)
     end
     
     it 'should have punch load the time data' do
@@ -160,20 +160,18 @@ describe Freshtrack do
     end
     
     it 'should pass the supplied project when getting the time data' do
-      Punch.expects(:list).with(@project_name)
+      Punch.expects(:list).with(@project_name, anything)
       Freshtrack.get_time_data(@project_name)
     end
     
     it 'should pass the supplied options on when getting the time data' do
-      pending 'options'
-      options = 'options go here'
-      IO.expects(:read).with(regexp_matches(/\b#{@project_name} #{options}\b/))
+      options = { :after => Time.now - 12345 }
+      Punch.expects(:list).with(@project_name, options)
       Freshtrack.get_time_data(@project_name, options)
     end
     
-    it 'should pass no options by default' do
-      pending 'options'
-      IO.expects(:read).with(regexp_matches(/\b#{@project_name} $/))
+    it 'should pass an empty hash by default' do
+      Punch.expects(:list).with(@project_name, {})
       Freshtrack.get_time_data(@project_name)
     end
     

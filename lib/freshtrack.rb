@@ -37,9 +37,9 @@ module Freshtrack
       raise unless @task
     end
     
-    def get_time_data(project_name, options = '')
+    def get_time_data(project_name, options = {})
       Punch.load
-      time_data = Punch.list(project_name)
+      time_data = Punch.list(project_name, options)
       condense_time_data(time_data)
     end
     
