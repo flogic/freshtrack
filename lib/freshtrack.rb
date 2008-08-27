@@ -2,6 +2,7 @@ $:.unshift File.dirname(__FILE__)
 require 'freshbooks/extensions'
 require 'freshtrack/core_ext'
 require 'yaml'
+require 'punch'
 
 module Freshtrack
   class << self
@@ -37,7 +38,8 @@ module Freshtrack
     end
     
     def get_time_data(project_name, options = '')
-      time_data = IO.read("| punch list #{project_name} #{options}")
+      Punch.load
+      time_data = Punch.list(project_name)
       convert_time_data(time_data)
     end
     

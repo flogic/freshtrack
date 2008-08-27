@@ -132,7 +132,8 @@ describe Freshtrack do
     before :each do
       @project_name = :proj
       @time_data = stub('time data')
-      IO.stubs(:read).returns(@time_data)
+      Punch.stubs(:load)
+      Punch.stubs(:list).returns(@time_data)
       Freshtrack.stubs(:convert_time_data)
     end
     
@@ -148,23 +149,30 @@ describe Freshtrack do
       lambda { Freshtrack.get_time_data(@project_name, 'option string') }.should_not raise_error(ArgumentError)
     end
     
-    it 'should get the time data (from punch)' do
-      IO.expects(:read).with(regexp_matches(/^\| punch list\b/))
+    it 'should have punch load the time data' do
+      Punch.expects(:load)
+      Freshtrack.get_time_data(@project_name)
+    end
+    
+    it 'should get the time data from punch' do
+      Punch.expects(:list)
       Freshtrack.get_time_data(@project_name)
     end
     
     it 'should pass the supplied project when getting the time data' do
-      IO.expects(:read).with(regexp_matches(/\b#{@project_name}\b/))
+      Punch.expects(:list).with(@project_name)
       Freshtrack.get_time_data(@project_name)
     end
     
-    it 'should pass the supplied option string on when getting the time data' do
+    it 'should pass the supplied options on when getting the time data' do
+      pending 'options'
       options = 'options go here'
       IO.expects(:read).with(regexp_matches(/\b#{@project_name} #{options}\b/))
       Freshtrack.get_time_data(@project_name, options)
     end
     
-    it 'should default option string to empty string' do
+    it 'should pass no options by default' do
+      pending 'options'
       IO.expects(:read).with(regexp_matches(/\b#{@project_name} $/))
       Freshtrack.get_time_data(@project_name)
     end
