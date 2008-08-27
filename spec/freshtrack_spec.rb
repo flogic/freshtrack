@@ -134,7 +134,7 @@ describe Freshtrack do
       @time_data = stub('time data')
       Punch.stubs(:load)
       Punch.stubs(:list).returns(@time_data)
-      Freshtrack.stubs(:convert_time_data)
+      Freshtrack.stubs(:condense_time_data)
     end
     
     it 'should require an argument' do
@@ -177,49 +177,15 @@ describe Freshtrack do
       Freshtrack.get_time_data(@project_name)
     end
     
-    it 'should convert the time data' do
-      Freshtrack.expects(:convert_time_data).with(@time_data)
+    it 'should condense the time data' do
+      Freshtrack.expects(:condense_time_data).with(@time_data)
       Freshtrack.get_time_data(@project_name)
-    end
-    
-    it 'should return the converted data' do
-      converted = stub('converted time data')
-      Freshtrack.stubs(:convert_time_data).returns(converted)
-      Freshtrack.get_time_data(@project_name).should == converted
-    end
-  end
-  
-  describe 'converting time data' do
-    before :each do
-      @time_data = stub('time data')
-      YAML.stubs(:load)
-      Freshtrack.stubs(:condense_time_data)
-    end
-    
-    it 'should require an argument' do
-      lambda { Freshtrack.convert_time_data }.should raise_error(ArgumentError)
-    end
-    
-    it 'should accept an argument' do
-      lambda { Freshtrack.convert_time_data(@time_data) }.should_not raise_error(ArgumentError)
-    end
-    
-    it 'should convert the time data from YAML' do
-      YAML.expects(:load).with(@time_data)
-      Freshtrack.convert_time_data(@time_data)
-    end
-    
-    it 'should condense the raw data' do
-      raw = stub('raw time data')
-      YAML.stubs(:load).returns(raw)
-      Freshtrack.expects(:condense_time_data).with(raw)
-      Freshtrack.convert_time_data(@project_name)
     end
     
     it 'should return the condensed data' do
       condensed = stub('condensed time data')
       Freshtrack.stubs(:condense_time_data).returns(condensed)
-      Freshtrack.convert_time_data(@time_data).should == condensed
+      Freshtrack.get_time_data(@project_name).should == condensed
     end
   end
   

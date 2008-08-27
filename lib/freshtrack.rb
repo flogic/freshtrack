@@ -40,12 +40,7 @@ module Freshtrack
     def get_time_data(project_name, options = '')
       Punch.load
       time_data = Punch.list(project_name)
-      convert_time_data(time_data)
-    end
-    
-    def convert_time_data(time_data)
-      raw = YAML.load(time_data)
-      condense_time_data(raw)
+      condense_time_data(time_data)
     end
     
     def condense_time_data(time_data)
