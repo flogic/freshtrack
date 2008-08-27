@@ -22,6 +22,7 @@ script/destroy
 script/generate
 setup.rb
 spec/base_object_spec.rb
+spec/freshtrack_command_spec.rb
 spec/freshtrack_spec.rb
 spec/project_spec.rb
 spec/task_spec.rb
