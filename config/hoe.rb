@@ -2,7 +2,7 @@ require 'freshtrack/version'
 
 AUTHOR = 'Yossef Mendelssohn'  # can also be an array of Authors
 EMAIL = 'ymendel@pobox.com'
-DESCRIPTION = "description of gem"
+DESCRIPTION = "Track your time on FreshBooks"
 GEM_NAME = 'freshtrack' # what ppl will type to install your gem
 RUBYFORGE_PROJECT = 'yomendel' # The unix name for your project
 HOMEPATH = "http://#{RUBYFORGE_PROJECT}.rubyforge.org"
@@ -60,8 +60,8 @@ hoe = Hoe.new(GEM_NAME, VERS) do |p|
   # == Optional
   p.changes = p.paragraphs_of("History.txt", 0..1).join("\n\n")
   p.extra_deps = [     # An array of rubygem dependencies [name, version], e.g. [ ['active_support', '>= 1.3.1'] ]
-    ['freshbooks', '>= 2.1'],
-    ['punch',      '>= 0.0.1']
+    ['freshbooks', '= 2.1'],
+    ['one_inch_punch', '>= 0.0.3']
   ]
   
   #p.spec_extras = {}    # A hash of extra values to set in the gemspec.

@@ -1,18 +1,36 @@
-Freshtrack is used to automatically create time entries in FreshBooks.
+= freshtrack
 
-It presently depends on punch, the gem by Ara T. Howard, and any arguments given to 
-freshtrack are passed along to punch as if freshtrack were an alias for 'punch list'.
+== DESCRIPTION:
 
-For example
+Freshtrack is used to automatically create time entries in FreshBooks from your own tracked time.
 
-  freshtrack proj --after 2008-01-16 --before 2008-02-01
+== FEATURES/PROBLEMS:
 
-would get time data for the second half of January 2008 by using the command
+* Simple and easy to use
 
-  punch list proj --after 2008-01-16 --before 2008-02-01
+* Only works with data from one_inch_punch
 
+== SYNOPSIS:
 
-Freshtrack requires a configuration file, ~/.freshtrack.yml, that looks something like
+  $ freshtrack proj
+  
+  or
+  
+  $ freshtrack proj --before 2008-08-16
+  
+  or! (if you really want)
+  
+  require 'freshtrack'
+  
+  Freshtrack.init
+  Freshtrack.track('proj', :before => Time.parse('2008-08-16'))
+
+== REQUIREMENTS:
+
+* one_inch_punch (gem)
+* freshbooks (gem)
+* A FreshBooks account
+* a configuration file located at ~/.freshtrack.yml and looking like
 
   --- 
   company: Company Name
@@ -22,9 +40,13 @@ Freshtrack requires a configuration file, ~/.freshtrack.yml, that looks somethin
       :project: FreshBooks Project Name
       :task: FreshBooks Task Name
 
-The 'Company Name' is the XXX in 'XXX.freshbooks.com'. The 'project_name' is the XXX in 'punch list XXX'
+(The 'Company Name' is the XXX in 'XXX.freshbooks.com'. The 'project_name' is the XXX in 'punch list XXX'.)
 
+== INSTALL:
 
-NOTE: As of this writing, punch (0.0.1) specifically requires attributes version 5.0.0 even though 5.0.1 is out.
-Because of the way gems work, punch will not work if both are installed. Make sure the specific installed version 
-of attributes is 5.0.0.
+* gem install freshtrack
+
+== THANKS:
+
+  * Kevin Barnes and Rick Bradley, for giving me a reason to track time and invoice people for it
+  * The FreshBooks team, for making invoicing easy
