@@ -70,7 +70,7 @@ module Freshtrack
       end
     end
     
-    def get_data(project_name, options = '')
+    def get_data(project_name, options = {})
       get_project_data(project_name)
       get_time_data(project_name, options)
     end
