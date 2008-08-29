@@ -1,3 +1,11 @@
+== 0.4.0 2008-08-29
+
+* 1 minor enhancement:
+  * Extracted the time-collection concern from Freshtrack itself and created time collectors:
+    * one_inch_punch
+    * punch
+    * More can be easily made
+
 == 0.3.0 2008-08-27
 
 * 1 minor enhancement:

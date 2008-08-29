@@ -8,7 +8,7 @@ Freshtrack is used to automatically create time entries in FreshBooks from your 
 
 * Simple and easy to use
 
-* Only works with data from one_inch_punch
+* Modular time-collector system
 
 == SYNOPSIS:
 
@@ -27,12 +27,13 @@ Freshtrack is used to automatically create time entries in FreshBooks from your 
 
 == REQUIREMENTS:
 
-* one_inch_punch (gem)
+* a time collector (see below)
 * freshbooks (gem)
 * A FreshBooks account
 * a configuration file located at ~/.freshtrack.yml and looking like
 
   --- 
+  collector: one_inch_punch
   company: Company Name
   token: API Token
   project_task_mapping:
@@ -41,6 +42,9 @@ Freshtrack is used to automatically create time entries in FreshBooks from your 
       :task: FreshBooks Task Name
 
 (The 'Company Name' is the XXX in 'XXX.freshbooks.com'. The 'project_name' is the XXX in 'punch list XXX'.)
+
+The 'collector' is what freshtrack will use to gather the time data that will end up as FreshBooks time entries.
+Freshtrack ships with two collectors: 'punch' and 'one_inch_punch'. These are both gems that can be installed (by `gem install [collector name]`) and used without much effort. If these time-tracking tools aren't to your liking, you are free to write your own collector. Further documentation on that is forthcoming, but for now just take a look at the two collectors that already exist.
 
 == INSTALL:
 
