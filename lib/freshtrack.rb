@@ -2,7 +2,8 @@ $:.unshift File.dirname(__FILE__)
 require 'freshbooks/extensions'
 require 'freshtrack/core_ext'
 require 'yaml'
-require 'punch'
+
+require 'freshtrack/time_collectors/one_inch_punch'
 
 module Freshtrack
   class << self
@@ -37,42 +38,10 @@ module Freshtrack
       raise unless @task
     end
     
-    def get_time_data(project_name, options = {})
-      Punch.load
-      time_data = Punch.list(project_name, options)
-      condense_time_data(time_data)
-    end
-    
-    def condense_time_data(time_data)
-      date_data = times_to_dates(time_data)
-      group_date_data(date_data)
-    end
-    
-    def times_to_dates(time_data)
-      time_data.each do |td|
-        punch_in  = td.delete('in')
-        punch_out = td.delete('out')
-        
-        td['date']  = punch_in.to_date
-        td['hours'] = (punch_out - punch_in).secs_to_hours
-      end
-    end
-    
-    def group_date_data(date_data)
-      separator = '-' * 20
-      grouped = date_data.group_by { |x|  x['date'] }
-      grouped.sort.inject([]) do |arr, (date, data)|
-        this_date = { 'date' => date }
-        this_date['hours'] = data.inject(0) { |sum, x|  sum + x['hours'] }
-        this_date['hours'] = ('%.2f' % this_date['hours']).to_f
-        this_date['notes'] = data.collect { |x|  x['log'].join("\n") }.join("\n" + separator + "\n")
-        arr + [this_date]
-      end
-    end
-    
     def get_data(project_name, options = {})
       get_project_data(project_name)
-      get_time_data(project_name, options)
+      collector = Freshtrack::TimeCollector::OneInchPunch.new(options)
+      collector.get_time_data(project_name)
     end
     
     def track(project_name, options = {})

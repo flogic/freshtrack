@@ -128,234 +128,12 @@ describe Freshtrack do
     end
   end
   
-  describe 'getting time data' do
-    before :each do
-      @project_name = :proj
-      @time_data = stub('time data')
-      Punch.stubs(:load)
-      Punch.stubs(:list).returns(@time_data)
-      Freshtrack.stubs(:condense_time_data)
-    end
-    
-    it 'should require an argument' do
-      lambda { Freshtrack.get_time_data }.should raise_error(ArgumentError)
-    end
-    
-    it 'should accept an argument' do
-      lambda { Freshtrack.get_time_data(@project_name) }.should_not raise_error(ArgumentError)
-    end
-    
-    it 'should accept options' do
-      lambda { Freshtrack.get_time_data(@project_name, :after => Time.now) }.should_not raise_error(ArgumentError)
-    end
-    
-    it 'should have punch load the time data' do
-      Punch.expects(:load)
-      Freshtrack.get_time_data(@project_name)
-    end
-    
-    it 'should get the time data from punch' do
-      Punch.expects(:list)
-      Freshtrack.get_time_data(@project_name)
-    end
-    
-    it 'should pass the supplied project when getting the time data' do
-      Punch.expects(:list).with(@project_name, anything)
-      Freshtrack.get_time_data(@project_name)
-    end
-    
-    it 'should pass the supplied options on when getting the time data' do
-      options = { :after => Time.now - 12345 }
-      Punch.expects(:list).with(@project_name, options)
-      Freshtrack.get_time_data(@project_name, options)
-    end
-    
-    it 'should pass an empty hash by default' do
-      Punch.expects(:list).with(@project_name, {})
-      Freshtrack.get_time_data(@project_name)
-    end
-    
-    it 'should condense the time data' do
-      Freshtrack.expects(:condense_time_data).with(@time_data)
-      Freshtrack.get_time_data(@project_name)
-    end
-    
-    it 'should return the condensed data' do
-      condensed = stub('condensed time data')
-      Freshtrack.stubs(:condense_time_data).returns(condensed)
-      Freshtrack.get_time_data(@project_name).should == condensed
-    end
-  end
-  
-  describe 'condensing time data' do
-    before :each do
-      @time_data = stub('time data')
-      Freshtrack.stubs(:times_to_dates)
-      Freshtrack.stubs(:group_date_data)
-    end
-    
-    it 'should require an argument' do
-      lambda { Freshtrack.condense_time_data }.should raise_error(ArgumentError)
-    end
-    
-    it 'should accept an argument' do
-      lambda { Freshtrack.condense_time_data(@time_data) }.should_not raise_error(ArgumentError)
-    end
-    
-    it 'should convert times to dates and hour differences' do
-      Freshtrack.expects(:times_to_dates).with(@time_data)
-      Freshtrack.condense_time_data(@time_data)
-    end
-    
-    it 'should group date and hour differences' do
-      date_hour_data = stub('date/hour data')
-      Freshtrack.stubs(:times_to_dates).returns(date_hour_data)
-      Freshtrack.expects(:group_date_data).with(date_hour_data)
-      Freshtrack.condense_time_data(@time_data)
-    end
-    
-    it 'should return the grouped date/hour data' do
-      grouped_dates = stub('grouped date/hour data')
-      Freshtrack.stubs(:group_date_data).returns(grouped_dates)
-      Freshtrack.condense_time_data(@time_data).should == grouped_dates
-    end
-  end
-  
-  describe 'converting times to dates and hour differences' do
-    before :each do
-      @time_data = []
-    end
-    
-    it 'should require an argument' do
-      lambda { Freshtrack.times_to_dates }.should raise_error(ArgumentError)
-    end
-    
-    it 'should accept an argument' do
-      lambda { Freshtrack.times_to_dates(@time_data) }.should_not raise_error(ArgumentError)
-    end
-    
-    it 'should return an array' do
-      Freshtrack.times_to_dates(@time_data).should be_kind_of(Array)
-    end
-    
-    it 'should replace the in/out time data with a single date' do
-      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 25, 7,  25, 0) })
-      result = Freshtrack.times_to_dates(@time_data)
-      result = result.first
-      
-      result.should     have_key('date')
-      result.should_not have_key('in')
-      result.should_not have_key('out')
-    end
-    
-    it 'should make the date appopriate to the time' do
-      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 25, 7,  25, 0) })
-      result = Freshtrack.times_to_dates(@time_data)
-      result = result.first
-      result['date'].should == Date.civil(2008, 1, 25)
-    end
-    
-    it 'should use the in time date' do
-      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 26, 7,  25, 0) })
-      result = Freshtrack.times_to_dates(@time_data)
-      result = result.first
-      result['date'].should == Date.civil(2008, 1, 25)
-    end
-    
-    it 'should add hour data' do
-      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 25, 7,  25, 0) })
-      result = Freshtrack.times_to_dates(@time_data)
-      result = result.first
-      result.should have_key('hours')
-    end
-    
-    it 'should make the hour data appropriate to the in/out difference' do
-      @time_data.push({ 'in' => Time.local(2008, 1, 25, 6,  25, 0), 'out' => Time.local(2008, 1, 25, 7,  55, 0) })
-      result = Freshtrack.times_to_dates(@time_data)
-      result = result.first
-      result['hours'].should == 1.5
-    end
-  end
-  
-  describe 'grouping date data' do
-    before :each do
-      @date_data = []
-    end
-    
-    it 'should require an argument' do
-      lambda { Freshtrack.group_date_data }.should raise_error(ArgumentError)
-    end
-    
-    it 'should accept an argument' do
-      lambda { Freshtrack.group_date_data(@date_data) }.should_not raise_error(ArgumentError)
-    end
-    
-    it 'should return an array' do
-      Freshtrack.group_date_data(@date_data).should be_kind_of(Array)
-    end
-    
-    it 'should group the data by date' do
-      today = Date.today
-      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => [] })
-      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => [] })
-      @date_data.push({ 'date' => today + 1, 'hours' => 0, 'log' => [] })
-      Freshtrack.group_date_data(@date_data).collect { |x|  x['date'] }.should == [today, today + 1]
-    end
-    
-    it 'should return the array sorted by date' do
-      today = Date.today
-      @date_data.push({ 'date' => today + 1, 'hours' => 0, 'log' => [] })
-      @date_data.push({ 'date' => today - 1, 'hours' => 0, 'log' => [] })
-      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => [] })
-      @date_data.push({ 'date' => today + 1, 'hours' => 0, 'log' => [] })
-      Freshtrack.group_date_data(@date_data).collect { |x|  x['date'] }.should == [today - 1, today, today + 1]
-    end
-    
-    it 'should add the hours for a particular date' do
-      today = Date.today
-      @date_data.push({ 'date' => today,     'hours' => 1, 'log' => [] })
-      @date_data.push({ 'date' => today,     'hours' => 3, 'log' => [] })
-      @date_data.push({ 'date' => today + 1, 'hours' => 2, 'log' => [] })
-      result = Freshtrack.group_date_data(@date_data)
-      
-      result[0]['date'].should  == today
-      result[0]['hours'].should == 4
-      
-      result[1]['date'].should  == today + 1
-      result[1]['hours'].should == 2
-    end
-    
-    it 'should round the hours to two decimal places' do
-      today = Date.today
-      @date_data.push({ 'date' => today, 'hours' => 1.666666666, 'log' => [] })
-      result = Freshtrack.group_date_data(@date_data)
-      
-      result[0]['date'].should  == today
-      result[0]['hours'].should == 1.67
-    end
-    
-    it 'should join the log into notes' do
-      today = Date.today
-      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => ['punch in 1', 'punch out 1'] })
-      @date_data.push({ 'date' => today,     'hours' => 0, 'log' => ['punch in 2', 'punch out 2'] })
-      @date_data.push({ 'date' => today + 1, 'hours' => 0, 'log' => ['punch in 3', 'punch out 3'] })
-      result = Freshtrack.group_date_data(@date_data)
-      
-      result[0]['date'].should  == today
-      result[0]['notes'].should == "punch in 1\npunch out 1\n--------------------\npunch in 2\npunch out 2"
-      result[0].should_not have_key('log')
-      
-      result[1]['date'].should  == today + 1
-      result[1]['notes'].should == "punch in 3\npunch out 3"
-      result[1].should_not have_key('log')
-    end
-  end
-  
   describe 'getting data' do
     before :each do
       @project_name = :proj
       Freshtrack.stubs(:get_project_data)
-      Freshtrack.stubs(:get_time_data)
+      @collector = stub('collector', :get_time_data => nil)
+      Freshtrack::TimeCollector::OneInchPunch.stubs(:new).returns(@collector)
     end
     
     it 'should require an argument' do
@@ -375,25 +153,30 @@ describe Freshtrack do
       Freshtrack.get_data(@project_name)
     end
     
-    it 'should get time data for supplied project' do
-      Freshtrack.expects(:get_time_data).with(@project_name, anything)
+    it 'should create a time collector' do
+      Freshtrack::TimeCollector::OneInchPunch.expects(:new).returns(@collector)
       Freshtrack.get_data(@project_name)
     end
     
-    it 'should pass options on when getting time data' do
+    it 'should get time data for supplied project' do
+      @collector.expects(:get_time_data).with(@project_name)
+      Freshtrack.get_data(@project_name)
+    end
+    
+    it 'should pass the options on when creating a time collector' do
       options = { :after => Time.now - 12345 }
-      Freshtrack.expects(:get_time_data).with(@project_name, options)
+      Freshtrack::TimeCollector::OneInchPunch.expects(:new).with(options).returns(@collector)
       Freshtrack.get_data(@project_name, options)
     end
     
     it 'should default options to an empty hash' do
-      Freshtrack.expects(:get_time_data).with(@project_name, {})
+      Freshtrack::TimeCollector::OneInchPunch.expects(:new).with({}).returns(@collector)
       Freshtrack.get_data(@project_name)
     end
     
     it 'should return time data' do
       time_data = stub('time data')
-      Freshtrack.stubs(:get_time_data).returns(time_data)
+      @collector.stubs(:get_time_data).returns(time_data)
       Freshtrack.get_data(@project_name).should == time_data
     end
   end
