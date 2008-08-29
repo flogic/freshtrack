@@ -13,6 +13,7 @@ lib/freshtrack/core_ext/array.rb
 lib/freshtrack/core_ext/numeric.rb
 lib/freshtrack/core_ext/time.rb
 lib/freshtrack/time_collectors/one_inch_punch.rb
+lib/freshtrack/time_collectors/punch.rb
 lib/freshbooks/extensions.rb
 lib/freshbooks/extensions/base_object.rb
 lib/freshbooks/extensions/project.rb
@@ -26,6 +27,7 @@ spec/core_ext/array_spec.rb
 spec/core_ext/numeric_spec.rb
 spec/core_ext/time_spec.rb
 spec/time_collectors/one_inch_punch_spec.rb
+spec/time_collectors/punch_spec.rb
 spec/freshbooks/base_object_spec.rb
 spec/freshbooks/project_spec.rb
 spec/freshbooks/task_spec.rb
