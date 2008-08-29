@@ -133,7 +133,7 @@ describe Freshtrack do
       @project_name = :proj
       Freshtrack.stubs(:get_project_data)
       @collector = stub('collector', :get_time_data => nil)
-      Freshtrack::TimeCollector::OneInchPunch.stubs(:new).returns(@collector)
+      Freshtrack.stubs(:collector).returns(@collector)
     end
     
     it 'should require an argument' do
@@ -153,8 +153,8 @@ describe Freshtrack do
       Freshtrack.get_data(@project_name)
     end
     
-    it 'should create a time collector' do
-      Freshtrack::TimeCollector::OneInchPunch.expects(:new).returns(@collector)
+    it 'should retrieve a time collector' do
+      Freshtrack.expects(:collector).returns(@collector)
       Freshtrack.get_data(@project_name)
     end
     
@@ -163,14 +163,14 @@ describe Freshtrack do
       Freshtrack.get_data(@project_name)
     end
     
-    it 'should pass the options on when creating a time collector' do
+    it 'should pass the options on when retrieving a time collector' do
       options = { :after => Time.now - 12345 }
-      Freshtrack::TimeCollector::OneInchPunch.expects(:new).with(options).returns(@collector)
+      Freshtrack.expects(:collector).with(options).returns(@collector)
       Freshtrack.get_data(@project_name, options)
     end
     
     it 'should default options to an empty hash' do
-      Freshtrack::TimeCollector::OneInchPunch.expects(:new).with({}).returns(@collector)
+      Freshtrack.expects(:collector).with({}).returns(@collector)
       Freshtrack.get_data(@project_name)
     end
     
@@ -178,6 +178,84 @@ describe Freshtrack do
       time_data = stub('time data')
       @collector.stubs(:get_time_data).returns(time_data)
       Freshtrack.get_data(@project_name).should == time_data
+    end
+  end
+  
+  describe 'getting a collector' do
+    module Freshtrack
+      module TimeCollectors
+        class Punch
+        end
+        
+        class OneInchPunch
+        end
+      end
+    end
+    
+    before :each do
+      Freshtrack.stubs(:config).returns({'collector' => 'punch' })
+      @collector = stub('collector')
+      Freshtrack::TimeCollectors::Punch.stubs(:new).returns(@collector)
+    end
+    
+    it 'should accept options' do
+      lambda { Freshtrack.collector(:before => Time.now) }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should not require options' do
+      lambda { Freshtrack.collector }.should_not raise_error(ArgumentError)
+    end
+    
+    it 'should require a library based on the collector given in the config' do
+      Freshtrack.expects(:require).with('freshtrack/time_collectors/punch')
+      Freshtrack.collector
+    end
+    
+    it 'should create a collector object based on the collector given in the config' do
+      Freshtrack::TimeCollectors::Punch.expects(:new)
+      Freshtrack.collector
+    end
+    
+    it 'should pass the options on when creating a collector object' do
+      options = { :before => Time.now }
+      Freshtrack::TimeCollectors::Punch.expects(:new).with(options)
+      Freshtrack.collector(options)
+    end
+    
+    it 'should pass an empty hash if no options given' do
+      Freshtrack::TimeCollectors::Punch.expects(:new).with({})
+      Freshtrack.collector
+    end
+    
+    it 'should return the collector' do
+      Freshtrack.collector.should == @collector
+    end
+    
+    it 'should error if no collector is given in the config' do
+      Freshtrack.stubs(:config).returns({})
+      lambda { Freshtrack.collector }.should raise_error
+    end
+    
+    it "should accept a collector of 'punch'" do
+      Freshtrack.stubs(:config).returns({'collector' => 'punch'})
+      lambda { Freshtrack.collector }.should_not raise_error
+    end
+    
+    it "should accept a collector of 'one_inch_punch'" do
+      Freshtrack.stubs(:config).returns({'collector' => 'one_inch_punch'})
+      Freshtrack::TimeCollectors::OneInchPunch.stubs(:new)
+      lambda { Freshtrack.collector }.should_not raise_error
+    end
+    
+    it 'should correctly camel-case a collector name' do
+      Freshtrack.stubs(:config).returns({'collector' => 'one_inch_punch'})
+      Freshtrack::TimeCollectors::OneInchPunch.expects(:new)
+      Freshtrack.collector
+    end
+    
+    it 'should error if an unknown collector is given in the config' do
+      Freshtrack.stubs(:config).returns({'collector' => 'blam'})
+      lambda { Freshtrack.collector }.should raise_error
     end
   end
   

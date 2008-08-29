@@ -3,8 +3,6 @@ require 'freshbooks/extensions'
 require 'freshtrack/core_ext'
 require 'yaml'
 
-require 'freshtrack/time_collectors/one_inch_punch'
-
 module Freshtrack
   class << self
     attr_reader :config, :project, :task
@@ -40,8 +38,7 @@ module Freshtrack
     
     def get_data(project_name, options = {})
       get_project_data(project_name)
-      collector = Freshtrack::TimeCollector::OneInchPunch.new(options)
-      collector.get_time_data(project_name)
+      collector(options).get_time_data(project_name)
     end
     
     def track(project_name, options = {})
@@ -68,6 +65,14 @@ module Freshtrack
         STDERR.puts "warning: unsuccessful time entry creation for date #{entry_data['date']}"
         nil
       end
+    end
+    
+    def collector(options = {})
+      collector_name = config['collector']
+      class_name = collector_name.capitalize.gsub(/([a-z])_([a-z])/) { "#{$1}#{$2.upcase}" }
+      require "freshtrack/time_collectors/#{collector_name}"
+      klass = Freshtrack::TimeCollectors.const_get(class_name)
+      klass.new(options)
     end
   end
 end
