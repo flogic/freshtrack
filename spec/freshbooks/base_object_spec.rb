@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/spec_helper.rb'
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 Thing     = FreshBooks::BaseObject.new(:attr)
 ThingDeal = FreshBooks::BaseObject.new(:attr)
