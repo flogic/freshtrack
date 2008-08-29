@@ -1,45 +1,15 @@
+require 'freshtrack/time_collectors/punchy_template'
 require 'punch'
 
 module Freshtrack
   module TimeCollector
     class OneInchPunch
-      attr_reader :options
-      
-      def initialize(options = {})
-        @options = options
-      end
+      include PunchyTemplate
       
       def get_time_data(project)
         Punch.load
         time_data = Punch.list(project, options)
         condense_time_data(time_data)
-      end
-      
-      def condense_time_data(time_data)
-        date_data = times_to_dates(time_data)
-        group_date_data(date_data)
-      end
-      
-      def times_to_dates(time_data)
-        time_data.each do |td|
-          punch_in  = td.delete('in')
-          punch_out = td.delete('out')
-
-          td['date']  = punch_in.to_date
-          td['hours'] = (punch_out - punch_in).secs_to_hours
-        end
-      end
-      
-      def group_date_data(date_data)
-        separator = '-' * 20
-        grouped = date_data.group_by { |x|  x['date'] }
-        grouped.sort.inject([]) do |arr, (date, data)|
-          this_date = { 'date' => date }
-          this_date['hours'] = data.inject(0) { |sum, x|  sum + x['hours'] }
-          this_date['hours'] = ('%.2f' % this_date['hours']).to_f
-          this_date['notes'] = data.collect { |x|  x['log'].join("\n") }.join("\n" + separator + "\n")
-          arr + [this_date]
-        end
       end
     end
   end
