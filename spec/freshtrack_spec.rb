@@ -183,7 +183,7 @@ describe Freshtrack do
   
   describe 'getting a collector' do
     module Freshtrack
-      module TimeCollectors
+      module TimeCollector
         class Punch
         end
         
@@ -195,7 +195,7 @@ describe Freshtrack do
     before :each do
       Freshtrack.stubs(:config).returns({'collector' => 'punch' })
       @collector = stub('collector')
-      Freshtrack::TimeCollectors::Punch.stubs(:new).returns(@collector)
+      Freshtrack::TimeCollector::Punch.stubs(:new).returns(@collector)
     end
     
     it 'should accept options' do
@@ -212,18 +212,18 @@ describe Freshtrack do
     end
     
     it 'should create a collector object based on the collector given in the config' do
-      Freshtrack::TimeCollectors::Punch.expects(:new)
+      Freshtrack::TimeCollector::Punch.expects(:new)
       Freshtrack.collector
     end
     
     it 'should pass the options on when creating a collector object' do
       options = { :before => Time.now }
-      Freshtrack::TimeCollectors::Punch.expects(:new).with(options)
+      Freshtrack::TimeCollector::Punch.expects(:new).with(options)
       Freshtrack.collector(options)
     end
     
     it 'should pass an empty hash if no options given' do
-      Freshtrack::TimeCollectors::Punch.expects(:new).with({})
+      Freshtrack::TimeCollector::Punch.expects(:new).with({})
       Freshtrack.collector
     end
     
@@ -243,13 +243,13 @@ describe Freshtrack do
     
     it "should accept a collector of 'one_inch_punch'" do
       Freshtrack.stubs(:config).returns({'collector' => 'one_inch_punch'})
-      Freshtrack::TimeCollectors::OneInchPunch.stubs(:new)
+      Freshtrack::TimeCollector::OneInchPunch.stubs(:new)
       lambda { Freshtrack.collector }.should_not raise_error
     end
     
     it 'should correctly camel-case a collector name' do
       Freshtrack.stubs(:config).returns({'collector' => 'one_inch_punch'})
-      Freshtrack::TimeCollectors::OneInchPunch.expects(:new)
+      Freshtrack::TimeCollector::OneInchPunch.expects(:new)
       Freshtrack.collector
     end
     

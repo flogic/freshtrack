@@ -7,8 +7,8 @@ module Freshtrack
       include PunchyTemplate
       
       def get_time_data(project)
-        Punch.load
-        time_data = Punch.list(project, options)
+        ::Punch.load
+        time_data = ::Punch.list(project, options)
         condense_time_data(time_data)
       end
     end

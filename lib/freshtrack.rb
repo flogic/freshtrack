@@ -71,7 +71,7 @@ module Freshtrack
       collector_name = config['collector']
       class_name = collector_name.capitalize.gsub(/([a-z])_([a-z])/) { "#{$1}#{$2.upcase}" }
       require "freshtrack/time_collectors/#{collector_name}"
-      klass = Freshtrack::TimeCollectors.const_get(class_name)
+      klass = Freshtrack::TimeCollector.const_get(class_name)
       klass.new(options)
     end
   end
