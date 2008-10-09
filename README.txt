@@ -46,6 +46,15 @@ Freshtrack is used to automatically create time entries in FreshBooks from your 
 The 'collector' is what freshtrack will use to gather the time data that will end up as FreshBooks time entries.
 Freshtrack ships with two collectors: 'punch' and 'one_inch_punch'. These are both gems that can be installed (by `gem install [collector name]`) and used without much effort. If these time-tracking tools aren't to your liking, you are free to write your own collector. Further documentation on that is forthcoming, but for now just take a look at the two collectors that already exist.
 
+Collector requirements:
+
+* It needs to be a class in the FreshTrack::TimeCollector namespace
+* The file needs to exist in the freshtrack/time_collectors directory
+* The class name should match the file name like Punch -> punch.rb or OneInchPunch -> one_inch_punch.rb
+* It needs an initializer that takes an options argument (which will be a hash possibly having :before and :after keys with Date values)
+* It needs a get_time_data instance method which takes a project name argument
+* The get_time_data method needs to return an array of hashes like { 'date' => date_object, 'hours' => number_of_hours_as_float, 'notes' => notes_string }
+
 == INSTALL:
 
 * gem install freshtrack
