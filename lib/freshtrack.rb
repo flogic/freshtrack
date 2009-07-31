@@ -79,5 +79,15 @@ module Freshtrack
       invoices = FreshBooks::Invoice.list || []
       invoices.select { |i|  i.open? }
     end
+    
+    def invoice_aging
+      open_invoices.collect do |i|
+        {
+          :id     => i.invoice_id,
+          :client => i.client_id,
+          :age    => Date.today - i.date
+        }
+      end
+    end
   end
 end

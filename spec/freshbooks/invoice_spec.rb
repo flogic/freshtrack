@@ -23,6 +23,20 @@ describe FreshBooks::Invoice do
     end
   end
   
+  describe 'type mappings' do
+    before :each do
+      @mapping = FreshBooks::Invoice::TYPE_MAPPINGS
+    end
+    
+    it 'should map client_id to Fixnum' do
+      @mapping['client_id'].should == Fixnum
+    end
+    
+    it 'should map date to Date' do
+      @mapping['date'].should == Date
+    end
+  end
+  
   it 'should indicate open status' do
     @invoice.should respond_to(:open?)
   end

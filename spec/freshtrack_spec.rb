@@ -433,4 +433,45 @@ describe Freshtrack do
       Freshtrack.open_invoices.should == []
     end
   end
+  
+  it 'should show invoice aging' do
+    Freshtrack.should respond_to(:invoice_aging)
+  end
+  
+  describe 'showing invoice aging' do
+    before :each do
+      today = Date.today
+      
+      @invoices = [
+        stub('invoice', :invoice_id => '1234',  :client_id => 20, :date => today - 3),
+        stub('invoice', :invoice_id => '19873', :client_id => 3,  :date => today - 20),
+        stub('invoice', :invoice_id => '0038',  :client_id => 4,  :date => today - 59)
+      ]
+      Freshtrack.stubs(:open_invoices).returns(@invoices)
+    end
+    
+    it 'should get open invoices' do
+      Freshtrack.expects(:open_invoices).returns(@invoices)
+      Freshtrack.invoice_aging
+    end
+    
+    it 'should extract the ID for each open invoice' do
+      ids = @invoices.collect { |i|  i.invoice_id }
+      Freshtrack.invoice_aging.collect { |i| i[:id] }.should == ids
+    end
+    
+    it 'should extract the client for each open invoice' do
+      clients = @invoices.collect { |i|  i.client_id }
+      Freshtrack.invoice_aging.collect { |i| i[:client] }.should == clients
+    end
+    
+    it 'should extract the age for each open invoice' do
+      Freshtrack.invoice_aging.collect { |i| i[:age] }.should == [3, 20, 59]
+    end
+    
+    it 'should return an empty array if there are no open invoices' do
+      Freshtrack.stubs(:open_invoices).returns([])
+      Freshtrack.invoice_aging.should == []
+    end
+  end
 end
