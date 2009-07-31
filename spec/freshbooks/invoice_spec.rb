@@ -88,4 +88,49 @@ describe FreshBooks::Invoice do
       @invoice.client.should == client
     end
   end
+  
+  describe 'number' do
+    it 'should be settable and gettable as an accessor' do
+      @invoice.number = '1234'
+      @invoice.number.should == '1234'
+    end
+    
+    it 'should be settable using []' do
+      @invoice['number'] = '1234'
+      @invoice.number.should == '1234'
+    end
+    
+    it 'should be gettable using []' do
+      @invoice.number = '1234'
+      @invoice['number'].should == '1234'
+    end
+    
+    it 'should show up in the members list' do
+      FreshBooks::Invoice.members.should include('number')
+    end
+  end
+  
+  it 'should still have important core behavior' do
+    FreshBooks::Invoice.should respond_to(:list)
+  end
+  
+  it 'should still be a type of BaseObject' do
+    FreshBooks::Invoice.should < FreshBooks::BaseObject
+  end
+  
+  it 'should still have other fields in the members list' do
+    members = FreshBooks::Invoice.members
+    members.should include('invoice_id')
+    members.should include('client_id')
+    members.should include('status')
+    members.should include('date')
+  end
+  
+  it 'should still allow other fields to be set and get using []' do
+    @invoice['status'] = 'paid'
+    @invoice.status.should == 'paid'
+    
+    @invoice.client_id = 3
+    @invoice['client_id'].should == 3
+  end
 end
