@@ -443,9 +443,9 @@ describe Freshtrack do
       today = Date.today
       
       @invoices = [
-        stub('invoice', :invoice_id => '1234',  :client => stub('client', :organization => 'client 20'), :date => today - 3),
-        stub('invoice', :invoice_id => '19873', :client => stub('client', :organization => 'client 3'),  :date => today - 20),
-        stub('invoice', :invoice_id => '0038',  :client => stub('client', :organization => 'client 4'),  :date => today - 59)
+        stub('invoice', :invoice_id => '1234',  :client => stub('client', :organization => 'client 20'), :date => today - 3,  :status => 'partial'),
+        stub('invoice', :invoice_id => '19873', :client => stub('client', :organization => 'client 3'),  :date => today - 20, :status => 'viewed'),
+        stub('invoice', :invoice_id => '0038',  :client => stub('client', :organization => 'client 4'),  :date => today - 59, :status => 'sent')
       ]
       Freshtrack.stubs(:open_invoices).returns(@invoices)
     end
@@ -467,6 +467,11 @@ describe Freshtrack do
     
     it 'should extract the age for each open invoice' do
       Freshtrack.invoice_aging.collect { |i| i[:age] }.should == [3, 20, 59]
+    end
+    
+    it 'should extract the status for each open invoice' do
+      statuses = @invoices.collect { |i|  i.status }
+      Freshtrack.invoice_aging.collect { |i| i[:status] }.should == statuses
     end
     
     it 'should return an empty array if there are no open invoices' do
