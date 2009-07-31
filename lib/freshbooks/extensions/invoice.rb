@@ -5,5 +5,9 @@ module FreshBooks
     def open?
       !%w[draft paid].include?(status)
     end
+    
+    def client
+      Client.get(client_id)
+    end
   end
 end

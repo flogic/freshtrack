@@ -67,4 +67,25 @@ describe FreshBooks::Invoice do
       @invoice.should be_open
     end
   end
+  
+  it 'should have a client' do
+    @invoice.should respond_to(:client)
+  end
+  
+  describe 'client' do
+    it 'should find client based on client_id' do
+      client_id = stub('client ID')
+      @invoice.stubs(:client_id).returns(client_id)
+      FreshBooks::Client.expects(:get).with(client_id)
+      @invoice.client
+    end
+    
+    it 'should return found project' do
+      client = stub('client')
+      client_id = stub('client ID')
+      @invoice.stubs(:client_id).returns(client_id)
+      FreshBooks::Client.expects(:get).with(client_id).returns(client)
+      @invoice.client.should == client
+    end
+  end
 end

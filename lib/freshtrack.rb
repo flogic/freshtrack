@@ -84,7 +84,7 @@ module Freshtrack
       open_invoices.collect do |i|
         {
           :id     => i.invoice_id,
-          :client => i.client_id,
+          :client => i.client.organization,
           :age    => Date.today - i.date
         }
       end
