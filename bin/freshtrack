@@ -13,6 +13,7 @@ require 'freshtrack'
 require 'optparse'
 require 'time'
 
+aging = false
 OPTIONS = {}
 MANDATORY_OPTIONS = %w[]
 
@@ -31,11 +32,25 @@ BANNER
           "Restrict command to only before the given time") { |time|  OPTIONS[:before] = Time.parse(time) }
   opts.on("-h", "--help",
           "Show this help message.") { puts opts; exit }
+  opts.on('--aging',
+          "Show invoice aging info.") { aging = true }
+
   opts.parse!(ARGV)
 
   if MANDATORY_OPTIONS && MANDATORY_OPTIONS.find { |option| OPTIONS[option.to_sym].nil? }
     puts opts; exit
   end
+end
+
+if aging
+  Freshtrack.init
+  aging = Freshtrack.invoice_aging
+  printf "%-10s\t%-50s\t%s\t%s\n", 'Invoice', 'Client', 'Age', 'Status'
+  printf "%s\n", '-' * 86
+  aging.each do |inv|
+    printf "%s\t%-50s\t%s\t%s\n", *inv.values_at(:id, :client, :age, :status)
+  end
+  exit
 end
 
 project = ARGV.shift

@@ -71,4 +71,77 @@ describe 'freshtrack command' do
     Freshtrack.expects(:track).with(@project, {})
     run_command(@project)
   end
+  
+  describe 'when --aging specified' do
+    before :each do
+      @aging_info = [
+        { :id => 5,  :age => 31, :client => 'blah', :status => 'viewed' },
+        { :id => 53, :age => 43, :client => 'bang', :status => 'sent' },
+        { :id => 20, :age => 3,  :client => 'boom', :status => 'viewed' }
+      ]
+      Freshtrack.stubs(:invoice_aging).returns(@aging_info)
+      self.stubs(:printf)
+    end
+    
+    def aging_run
+      run_command('--aging')
+    end
+    
+    it 'should not require a project' do
+      self.expects(:puts) { |text|  text.match(/usage.+project/i) }.never
+      aging_run
+    end
+    
+    it 'should init Freshtrack' do
+      Freshtrack.expects(:init)
+      aging_run
+    end
+    
+    it 'should get the invoice aging information' do
+      Freshtrack.expects(:invoice_aging).returns(@aging_info)
+      aging_run
+    end
+    
+    it 'should print the ID of each invoice' do
+      pending 'making this actually test what it purports to'
+      @aging_info.each do |info|
+        self.expects(:printf) { |*args|  args.include?(info[:id]) }
+      end
+      aging_run
+    end
+    
+    it 'should print the client of each invoice' do
+      pending 'making this actually test what it purports to'
+      @aging_info.each do |info|
+        self.expects(:printf) { |*args|  args.include?(info[:client]) }
+      end
+      aging_run
+    end
+    
+    it 'should print the age of each invoice' do
+      pending 'making this actually test what it purports to'
+      @aging_info.each do |info|
+        self.expects(:printf) { |*args|  args.include?(info[:age]) }
+      end
+      aging_run
+    end
+    
+    it 'should print the status of each invoice' do
+      pending 'making this actually test what it purports to'
+      @aging_info.each do |info|
+        self.expects(:printf) { |*args|  args.include?(info[:status]) }
+      end
+      aging_run
+    end
+    
+    it 'should not track time' do
+      Freshtrack.expects(:track).never
+      aging_run
+    end
+    
+    it 'should not track time even when given a project' do
+      Freshtrack.expects(:track).never
+      run_command('--aging', @project)
+    end
+  end
 end
