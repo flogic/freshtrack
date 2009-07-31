@@ -396,4 +396,41 @@ describe Freshtrack do
       end
     end
   end
+  
+  it 'should list open invoices' do
+    Freshtrack.should respond_to(:open_invoices)
+  end
+  
+  describe 'listing open invoices' do
+    before :each do
+      @invoices = Array.new(5) { stub('invoice', :open? => false) }
+      FreshBooks::Invoice.stubs(:list).returns(@invoices)
+    end
+    
+    it 'should get a list of invoices' do
+      FreshBooks::Invoice.expects(:list).returns(@invoices)
+      Freshtrack.open_invoices
+    end
+    
+    it 'should return only the open invoices' do
+      open_invoices = @invoices.values_at(0,1,2)
+      open_invoices.each { |i|  i.stubs(:open?).returns(true) }
+      
+      Freshtrack.open_invoices.should == open_invoices
+    end
+    
+    it 'should return an empty array if there are no open invoices' do
+      Freshtrack.open_invoices.should == []
+    end
+    
+    it 'should return an empty array if there are no invoices' do
+      FreshBooks::Invoice.stubs(:list).returns([])
+      Freshtrack.open_invoices.should == []
+    end
+    
+    it 'should return an empty array if the invoice list returns nil' do
+      FreshBooks::Invoice.stubs(:list).returns(nil)
+      Freshtrack.open_invoices.should == []
+    end
+  end
 end

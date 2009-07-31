@@ -74,5 +74,10 @@ module Freshtrack
       klass = Freshtrack::TimeCollector.const_get(class_name)
       klass.new(options)
     end
+    
+    def open_invoices
+      invoices = FreshBooks::Invoice.list || []
+      invoices.select { |i|  i.open? }
+    end
   end
 end
