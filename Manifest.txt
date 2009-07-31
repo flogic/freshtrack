@@ -17,6 +17,7 @@ lib/freshtrack/time_collectors/punch.rb
 lib/freshtrack/time_collectors/punchy_template.rb
 lib/freshbooks/extensions.rb
 lib/freshbooks/extensions/base_object.rb
+lib/freshbooks/extensions/invoice.rb
 lib/freshbooks/extensions/project.rb
 lib/freshbooks/extensions/task.rb
 lib/freshbooks/extensions/time_entry.rb
@@ -30,6 +31,7 @@ spec/core_ext/time_spec.rb
 spec/time_collectors/one_inch_punch_spec.rb
 spec/time_collectors/punch_spec.rb
 spec/freshbooks/base_object_spec.rb
+spec/freshbooks/invoice_spec.rb
 spec/freshbooks/project_spec.rb
 spec/freshbooks/task_spec.rb
 spec/freshbooks/time_entry_spec.rb
