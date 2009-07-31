@@ -48,7 +48,7 @@ if aging
   printf "%-10s\t%-50s\t%s\t%s\n", 'Invoice', 'Client', 'Age', 'Status'
   printf "%s\n", '-' * 86
   aging.each do |inv|
-    printf "%s\t%-50s\t%s\t%s\n", *inv.values_at(:id, :client, :age, :status)
+    printf "%-10s\t%-50s\t%s\t%s\n", *inv.values_at(:number, :client, :age, :status)
   end
   exit
 end

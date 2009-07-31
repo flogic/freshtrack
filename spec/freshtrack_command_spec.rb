@@ -75,9 +75,9 @@ describe 'freshtrack command' do
   describe 'when --aging specified' do
     before :each do
       @aging_info = [
-        { :id => 5,  :age => 31, :client => 'blah', :status => 'viewed' },
-        { :id => 53, :age => 43, :client => 'bang', :status => 'sent' },
-        { :id => 20, :age => 3,  :client => 'boom', :status => 'viewed' }
+        { :id => 5,  :number => '123', :age => 31, :client => 'blah', :status => 'viewed' },
+        { :id => 53, :number => '234', :age => 43, :client => 'bang', :status => 'sent' },
+        { :id => 20, :number => '938', :age => 3,  :client => 'boom', :status => 'viewed' }
       ]
       Freshtrack.stubs(:invoice_aging).returns(@aging_info)
       self.stubs(:printf)
@@ -102,10 +102,10 @@ describe 'freshtrack command' do
       aging_run
     end
     
-    it 'should print the ID of each invoice' do
+    it 'should print the number of each invoice' do
       pending 'making this actually test what it purports to'
       @aging_info.each do |info|
-        self.expects(:printf) { |*args|  args.include?(info[:id]) }
+        self.expects(:printf) { |*args|  args.include?(info[:number]) }
       end
       aging_run
     end

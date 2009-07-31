@@ -443,9 +443,9 @@ describe Freshtrack do
       today = Date.today
       
       @invoices = [
-        stub('invoice', :invoice_id => '1234',  :client => stub('client', :organization => 'client 20'), :date => today - 3,  :status => 'partial'),
-        stub('invoice', :invoice_id => '19873', :client => stub('client', :organization => 'client 3'),  :date => today - 20, :status => 'viewed'),
-        stub('invoice', :invoice_id => '0038',  :client => stub('client', :organization => 'client 4'),  :date => today - 59, :status => 'sent')
+        stub('invoice', :invoice_id => '1234',  :number => '4567',  :client => stub('client', :organization => 'client 20'), :date => today - 3,  :status => 'partial'),
+        stub('invoice', :invoice_id => '19873', :number => '1456',  :client => stub('client', :organization => 'client 3'),  :date => today - 20, :status => 'viewed'),
+        stub('invoice', :invoice_id => '0038',  :number => '30267', :client => stub('client', :organization => 'client 4'),  :date => today - 59, :status => 'sent')
       ]
       Freshtrack.stubs(:open_invoices).returns(@invoices)
     end
@@ -458,6 +458,11 @@ describe Freshtrack do
     it 'should extract the ID for each open invoice' do
       ids = @invoices.collect { |i|  i.invoice_id }
       Freshtrack.invoice_aging.collect { |i| i[:id] }.should == ids
+    end
+    
+    it 'should extract the number for each open invoice' do
+      numbers = @invoices.collect { |i|  i.number }
+      Freshtrack.invoice_aging.collect { |i| i[:number] }.should == numbers
     end
     
     it 'should extract the client for each open invoice' do
