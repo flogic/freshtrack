@@ -172,4 +172,33 @@ describe FreshBooks::Invoice do
       @invoice.payments.should == []
     end
   end
+  
+  it 'should have a paid amount' do
+    @invoice.should respond_to(:paid_amount)
+  end
+  
+  describe 'paid amount' do
+    it 'should be the sum of payment amounts' do
+      payments = [stub('payment', :amount => 3), stub('payment', :amount => 15), stub('payment', :amount => 5)]
+      @invoice.stubs(:payments).returns(payments)
+      @invoice.paid_amount.should == 23
+    end
+    
+    it 'should be 0 if there are no payments' do
+      @invoice.stubs(:payments).returns([])
+      @invoice.paid_amount.should == 0
+    end
+  end
+  
+  it 'should have an owed amount' do
+    @invoice.should respond_to(:owed_amount)
+  end
+  
+  describe 'owed amount' do
+    it 'should be invoice amount less paid amount' do
+      @invoice.amount = 60
+      @invoice.stubs(:paid_amount).returns(50)
+      @invoice.owed_amount.should == 10
+    end
+  end
 end

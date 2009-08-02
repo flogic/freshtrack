@@ -14,6 +14,14 @@ module FreshBooks
       Payment.list('invoice_id' => invoice_id) || []
     end
     
+    def paid_amount
+      payments.inject(0) { |sum, pay|  sum + pay.amount }
+    end
+    
+    def owed_amount
+      amount - paid_amount
+    end
+    
     attr_accessor :number
     
     alias_method :old_brackets, :[]
