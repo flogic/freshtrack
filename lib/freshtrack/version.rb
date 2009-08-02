@@ -2,9 +2,8 @@ module Freshtrack #:nodoc:
   module VERSION #:nodoc:
     MAJOR = 0
     MINOR = 4
-    TINY  = 1
-    FUCKUP = 1
+    TINY  = 2
 
-    STRING = [MAJOR, MINOR, TINY, FUCKUP].join('.')
+    STRING = [MAJOR, MINOR, TINY].join('.')
   end
 end

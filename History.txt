@@ -1,3 +1,8 @@
+== 0.4.2 2009-08-02
+
+* 1 tiny enhancement:
+  * Added invoice amount and owed amount to aging report
+
 == 0.4.1.1 2009-07-31
 
 * Maybe adding the invoice files to the Manifest is a good idea.
