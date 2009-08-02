@@ -32,6 +32,7 @@ spec/time_collectors/one_inch_punch_spec.rb
 spec/time_collectors/punch_spec.rb
 spec/freshbooks/base_object_spec.rb
 spec/freshbooks/invoice_spec.rb
+spec/freshbooks/payment_spec.rb
 spec/freshbooks/project_spec.rb
 spec/freshbooks/task_spec.rb
 spec/freshbooks/time_entry_spec.rb

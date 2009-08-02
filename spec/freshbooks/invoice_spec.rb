@@ -21,6 +21,10 @@ describe FreshBooks::Invoice do
     it 'should have a status' do
       @invoice.should respond_to(:status)
     end
+    
+    it 'should have an amount' do
+      @invoice.should respond_to(:amount)
+    end
   end
   
   describe 'type mappings' do
@@ -34,6 +38,10 @@ describe FreshBooks::Invoice do
     
     it 'should map date to Date' do
       @mapping['date'].should == Date
+    end
+    
+    it 'should map amount to Float' do
+      @mapping['amount'].should == Float
     end
   end
   
@@ -80,7 +88,7 @@ describe FreshBooks::Invoice do
       @invoice.client
     end
     
-    it 'should return found project' do
+    it 'should return found client' do
       client = stub('client')
       client_id = stub('client ID')
       @invoice.stubs(:client_id).returns(client_id)
@@ -132,5 +140,36 @@ describe FreshBooks::Invoice do
     
     @invoice.client_id = 3
     @invoice['client_id'].should == 3
+  end
+  
+  it 'should have payments' do
+    @invoice.should respond_to(:payments)
+  end
+  
+  describe 'payments' do
+    before :each do
+      @payments = Array.new(3) { stub('payment') }
+      FreshBooks::Payment.stubs(:list).returns(@payments)
+    end
+    
+    it 'should get a list from Payment' do
+      FreshBooks::Payment.expects(:list)
+      @invoice.payments
+    end
+    
+    it 'should pass the invoice_id when getting the list' do
+      @invoice.invoice_id = '0000073'
+      FreshBooks::Payment.expects(:list).with('invoice_id' => @invoice.invoice_id)
+      @invoice.payments
+    end
+    
+    it 'should return the list from Payment' do
+      @invoice.payments.should == @payments
+    end
+    
+    it 'should return an empty array if Payment returns nil' do
+      FreshBooks::Payment.stubs(:list).returns(nil)
+      @invoice.payments.should == []
+    end
   end
 end

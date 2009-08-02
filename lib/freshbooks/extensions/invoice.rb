@@ -10,6 +10,10 @@ module FreshBooks
       Client.get(client_id)
     end
     
+    def payments
+      Payment.list('invoice_id' => invoice_id) || []
+    end
+    
     attr_accessor :number
     
     alias_method :old_brackets, :[]
