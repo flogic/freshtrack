@@ -75,9 +75,9 @@ describe 'freshtrack command' do
   describe 'when --aging specified' do
     before :each do
       @aging_info = [
-        { :id => 5,  :number => '123', :age => 31, :client => 'blah', :status => 'viewed' },
-        { :id => 53, :number => '234', :age => 43, :client => 'bang', :status => 'sent' },
-        { :id => 20, :number => '938', :age => 3,  :client => 'boom', :status => 'viewed' }
+        { :id => 5,  :number => '123', :age => 31, :client => 'blah', :status => 'viewed', :amount => 123.3, :owed => 5.67 },
+        { :id => 53, :number => '234', :age => 43, :client => 'bang', :status => 'sent',   :amount => 60.0,  :owed => 60.0 },
+        { :id => 20, :number => '938', :age => 3,  :client => 'boom', :status => 'viewed', :amount => 100.0, :owed => 100.0 }
       ]
       Freshtrack.stubs(:invoice_aging).returns(@aging_info)
       self.stubs(:printf)
@@ -130,6 +130,22 @@ describe 'freshtrack command' do
       pending 'making this actually test what it purports to'
       @aging_info.each do |info|
         self.expects(:printf) { |*args|  args.include?(info[:status]) }
+      end
+      aging_run
+    end
+    
+    it 'should print the amount of each invoice' do
+      pending 'making this actually test what it purports to'
+      @aging_info.each do |info|
+        self.expects(:printf) { |*args|  args.include?(info[:amount]) }
+      end
+      aging_run
+    end
+    
+    it 'should print the owed of each invoice' do
+      pending 'making this actually test what it purports to'
+      @aging_info.each do |info|
+        self.expects(:printf) { |*args|  args.include?(info[:owed]) }
       end
       aging_run
     end

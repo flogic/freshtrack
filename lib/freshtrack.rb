@@ -87,7 +87,9 @@ module Freshtrack
           :number => i.number,
           :client => i.client.organization,
           :age    => Date.today - i.date,
-          :status => i.status
+          :status => i.status,
+          :amount => i.amount,
+          :owed   => i.owed_amount
         }
       end
     end

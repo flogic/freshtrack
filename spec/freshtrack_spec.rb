@@ -443,9 +443,9 @@ describe Freshtrack do
       today = Date.today
       
       @invoices = [
-        stub('invoice', :invoice_id => '1234',  :number => '4567',  :client => stub('client', :organization => 'client 20'), :date => today - 3,  :status => 'partial'),
-        stub('invoice', :invoice_id => '19873', :number => '1456',  :client => stub('client', :organization => 'client 3'),  :date => today - 20, :status => 'viewed'),
-        stub('invoice', :invoice_id => '0038',  :number => '30267', :client => stub('client', :organization => 'client 4'),  :date => today - 59, :status => 'sent')
+        stub('invoice', :invoice_id => '1234',  :number => '4567',  :client => stub('client', :organization => 'client 20'), :date => today - 3,  :status => 'partial', :amount => 50, :owed_amount => 3),
+        stub('invoice', :invoice_id => '19873', :number => '1456',  :client => stub('client', :organization => 'client 3'),  :date => today - 20, :status => 'viewed',  :amount => 60, :owed_amount => 60),
+        stub('invoice', :invoice_id => '0038',  :number => '30267', :client => stub('client', :organization => 'client 4'),  :date => today - 59, :status => 'sent',    :amount => 20, :owed_amount => 20)
       ]
       Freshtrack.stubs(:open_invoices).returns(@invoices)
     end
@@ -477,6 +477,16 @@ describe Freshtrack do
     it 'should extract the status for each open invoice' do
       statuses = @invoices.collect { |i|  i.status }
       Freshtrack.invoice_aging.collect { |i| i[:status] }.should == statuses
+    end
+    
+    it 'should extract the amount for each open invoice' do
+      amounts = @invoices.collect { |i|  i.amount }
+      Freshtrack.invoice_aging.collect { |i| i[:amount] }.should == amounts
+    end
+    
+    it 'should extract the owed amount for each open invoice' do
+      oweds = @invoices.collect { |i|  i.owed_amount }
+      Freshtrack.invoice_aging.collect { |i| i[:owed] }.should == oweds
     end
     
     it 'should return an empty array if there are no open invoices' do

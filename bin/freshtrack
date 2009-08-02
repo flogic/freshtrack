@@ -45,10 +45,10 @@ end
 if aging
   Freshtrack.init
   aging = Freshtrack.invoice_aging
-  printf "%-10s\t%-50s\t%s\t%s\n", 'Invoice', 'Client', 'Age', 'Status'
+  printf "%-8s  %-40s  %-5s  %-6s  %8s  %8s\n", 'Invoice', 'Client', 'Age', 'Status', 'Amount', 'Owed'
   printf "%s\n", '-' * 86
   aging.each do |inv|
-    printf "%-10s\t%-50s\t%s\t%s\n", *inv.values_at(:number, :client, :age, :status)
+    printf "%-8s  %-40s  %-5s  %-6s  %8.2f  %8.2f\n", *inv.values_at(:number, :client, :age, :status, :amount, :owed)
   end
   exit
 end
