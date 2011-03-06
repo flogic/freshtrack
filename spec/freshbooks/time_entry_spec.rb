@@ -1,38 +1,38 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe FreshBooks::TimeEntry do
-  before :each do
+  before do
     @time_entry = FreshBooks::TimeEntry.new
   end
   
   describe 'attributes' do
     it 'should have a time_entry_id' do
-      @time_entry.should respond_to(:time_entry_id)
+      @time_entry.should.respond_to(:time_entry_id)
     end
     
     it 'should have a project_id' do
-      @time_entry.should respond_to(:project_id)
+      @time_entry.should.respond_to(:project_id)
     end
     
     it 'should have a task_id' do
-      @time_entry.should respond_to(:task_id)
+      @time_entry.should.respond_to(:task_id)
     end
     
     it 'should have hours' do
-      @time_entry.should respond_to(:hours)
+      @time_entry.should.respond_to(:hours)
     end
     
     it 'should have a date' do
-      @time_entry.should respond_to(:date)
+      @time_entry.should.respond_to(:date)
     end
     
     it 'should have notes' do
-      @time_entry.should respond_to(:notes)
+      @time_entry.should.respond_to(:notes)
     end
   end
   
   describe 'type mappings' do
-    before :each do
+    before do
       @mapping = FreshBooks::TimeEntry::TYPE_MAPPINGS
     end
     
@@ -58,25 +58,25 @@ describe FreshBooks::TimeEntry do
   end
   
   describe 'creating an instance' do
-    before :each do
-      @response = stub('response', :success? => nil)
-      FreshBooks.stubs(:call_api).returns(@response)
+    before do
+      @response = mock('response', :success? => nil)
+      FreshBooks.stub!(:call_api).and_return(@response)
     end
     
     it 'should issue a request with the instance' do
-      FreshBooks.expects(:call_api).with('time_entry.create', 'time_entry' => @time_entry).returns(@response)
+      FreshBooks.should.receive(:call_api).with('time_entry.create', 'time_entry' => @time_entry).and_return(@response)
       @time_entry.create
     end
     
     describe 'with a successful request' do
-      before :each do
+      before do
         @time_entry_id = 5
-        @response.stubs(:elements).returns([stub('pre element'), stub('element', :text => @time_entry_id.to_s), stub('post element')])
-        @response.stubs(:success?).returns(true)
+        @response.stub!(:elements).and_return([mock('pre element'), mock('element', :text => @time_entry_id.to_s), mock('post element')])
+        @response.stub!(:success?).and_return(true)
       end
       
       it 'should set the ID from the response' do
-        @time_entry.expects(:time_entry_id=).with(@time_entry_id)
+        @time_entry.should.receive(:time_entry_id=).with(@time_entry_id)
         @time_entry.create
       end
       
@@ -86,265 +86,265 @@ describe FreshBooks::TimeEntry do
     end
     
     describe 'with an unsuccessful request' do
-      before :each do
-        @response.stubs(:success?).returns(false)
+      before do
+        @response.stub!(:success?).and_return(false)
       end
       
       it 'should not set the ID' do
-        @time_entry.expects(:time_entry_id=).never
+        @time_entry.should.receive(:time_entry_id=).never
         @time_entry.create
       end
       
       it 'should return nil' do
-        @time_entry.create.should be_nil
+        @time_entry.create.should.be.nil
       end
     end
   end
   
   describe 'updating an instance' do
-    before :each do
-      @response = stub('response', :success? => nil)
-      FreshBooks.stubs(:call_api).returns(@response)
+    before do
+      @response = mock('response', :success? => nil)
+      FreshBooks.stub!(:call_api).and_return(@response)
     end
     
     it 'should issue a request with the instance' do
-      FreshBooks.expects(:call_api).with('time_entry.update', 'time_entry' => @time_entry).returns(@response)
+      FreshBooks.should.receive(:call_api).with('time_entry.update', 'time_entry' => @time_entry).and_return(@response)
       @time_entry.update
     end
     
     describe 'with a successful request' do
-      before :each do
-        @response.stubs(:success?).returns(true)
+      before do
+        @response.stub!(:success?).and_return(true)
       end
       
       it 'should return true' do
-        @time_entry.update.should be(true)
+        @time_entry.update.should == true
       end
     end
     
     describe 'with an unsuccessful request' do
-      before :each do
-        @response.stubs(:success?).returns(false)
+      before do
+        @response.stub!(:success?).and_return(false)
       end
       
       it 'should return false' do
-        @time_entry.update.should be(false)
+        @time_entry.update.should == false
       end
     end
   end
   
   describe 'deleting an instance' do
-    before :each do
+    before do
       @time_entry_id = '5'
-      @response = stub('response', :success? => nil)
-      FreshBooks.stubs(:call_api).returns(@response)
+      @response = mock('response', :success? => nil)
+      FreshBooks.stub!(:call_api).and_return(@response)
     end
     
     describe 'from the class' do
       it 'should require an argument' do
-        lambda { FreshBooks::TimeEntry.delete }.should raise_error(ArgumentError)
+        lambda { FreshBooks::TimeEntry.delete }.should.raise(ArgumentError)
       end
       
       it 'should accept an argument' do
-        lambda { FreshBooks::TimeEntry.delete('arg') }.should_not raise_error(ArgumentError)
+        lambda { FreshBooks::TimeEntry.delete('arg') }.should.not.raise(ArgumentError)
       end
       
       it 'should issue a request with the supplied ID' do
-        FreshBooks.expects(:call_api).with('time_entry.delete', 'time_entry_id' => @time_entry_id).returns(@response)
+        FreshBooks.should.receive(:call_api).with('time_entry.delete', 'time_entry_id' => @time_entry_id).and_return(@response)
         FreshBooks::TimeEntry.delete(@time_entry_id)
       end
       
       describe 'with a successful request' do
-        before :each do
-          @response.stubs(:success?).returns(true)
+        before do
+          @response.stub!(:success?).and_return(true)
         end
         
         it 'should return true' do
-          FreshBooks::TimeEntry.delete(@time_entry_id).should be(true)
+          FreshBooks::TimeEntry.delete(@time_entry_id).should == true
         end
       end
       
       describe 'with an unsuccessful request' do
-        before :each do
-          @response.stubs(:success?).returns(false)
+        before do
+          @response.stub!(:success?).and_return(false)
         end
         
         it 'should return false' do
-          FreshBooks::TimeEntry.delete(@time_entry_id).should be(false)
+          FreshBooks::TimeEntry.delete(@time_entry_id).should == false
         end
       end
     end
     
     describe 'from the instance' do
-      before :each do
-        @time_entry.stubs(:time_entry_id).returns(@time_entry_id)
-        FreshBooks::TimeEntry.stubs(:delete)
+      before do
+        @time_entry.stub!(:time_entry_id).and_return(@time_entry_id)
+        FreshBooks::TimeEntry.stub!(:delete)
       end
       
       it 'should delegate to the class' do
-        FreshBooks::TimeEntry.expects(:delete)
+        FreshBooks::TimeEntry.should.receive(:delete)
         @time_entry.delete
       end
       
       it 'should pass its ID to the class method' do
-        FreshBooks::TimeEntry.expects(:delete).with(@time_entry_id)
+        FreshBooks::TimeEntry.should.receive(:delete).with(@time_entry_id)
         @time_entry.delete
       end
       
       it 'should return the result from the class method' do
-        val = stub('return val')
-        FreshBooks::TimeEntry.stubs(:delete).returns(val)
+        val = mock('return val')
+        FreshBooks::TimeEntry.stub!(:delete).and_return(val)
         @time_entry.delete.should == val
       end
     end
   end
   
   describe 'getting an instance' do
-    before :each do
+    before do
       @time_entry_id = 1
-      @element = stub('element')
-      @response = stub('response', :elements => [stub('pre element'), @element, stub('post element')], :success? => nil)
-      FreshBooks.stubs(:call_api).returns(@response)
+      @element = mock('element')
+      @response = mock('response', :elements => [mock('pre element'), @element, mock('post element')], :success? => nil)
+      FreshBooks.stub!(:call_api).and_return(@response)
     end
     
     it 'should require an argument' do
-      lambda { FreshBooks::TimeEntry.get }.should raise_error(ArgumentError)
+      lambda { FreshBooks::TimeEntry.get }.should.raise(ArgumentError)
     end
     
     it 'should accept an argument' do
-      lambda { FreshBooks::TimeEntry.get(@time_entry_id) }.should_not raise_error(ArgumentError)
+      lambda { FreshBooks::TimeEntry.get(@time_entry_id) }.should.not.raise(ArgumentError)
     end
     
     it 'should issue a request for the supplied ID' do
-      FreshBooks.expects(:call_api).with('time_entry.get', 'time_entry_id' => @time_entry_id).returns(@response)
+      FreshBooks.should.receive(:call_api).with('time_entry.get', 'time_entry_id' => @time_entry_id).and_return(@response)
       FreshBooks::TimeEntry.get(@time_entry_id)
     end
     
     describe 'with a successful request' do
-      before :each do
-        @response.stubs(:success?).returns(true)
+      before do
+        @response.stub!(:success?).and_return(true)
       end
       
       it 'should instantiate a new time_entry instance from the request' do
-        FreshBooks::TimeEntry.expects(:new_from_xml).with(@element)
+        FreshBooks::TimeEntry.should.receive(:new_from_xml).with(@element)
         FreshBooks::TimeEntry.get(@time_entry_id)
       end
       
       it 'should return the time_entry instance' do
-        val = stub('return val')
-        FreshBooks::TimeEntry.stubs(:new_from_xml).returns(val)
+        val = mock('return val')
+        FreshBooks::TimeEntry.stub!(:new_from_xml).and_return(val)
         FreshBooks::TimeEntry.get(@time_entry_id).should == val
       end
     end
     
     describe 'with an unsuccessful request' do
-      before :each do
-        @response.stubs(:success?).returns(false)
+      before do
+        @response.stub!(:success?).and_return(false)
       end
       
       it 'should return nil' do
-        FreshBooks::TimeEntry.get(@time_entry_id).should be_nil
+        FreshBooks::TimeEntry.get(@time_entry_id).should.be.nil
       end
     end
   end
   
   describe 'getting a list' do
-    before :each do
+    before do
       @time_entry_id = 1
-      @elements = Array.new(3) { stub('list element') }
-      @response = stub('response', :elements => [stub('pre element'), stub('element', :elements => @elements), stub('post element')], :success? => nil)
-      FreshBooks.stubs(:call_api).returns(@response)
+      @elements = Array.new(3) { mock('list element') }
+      @response = mock('response', :elements => [mock('pre element'), mock('element', :elements => @elements), mock('post element')], :success? => nil)
+      FreshBooks.stub!(:call_api).and_return(@response)
     end
     
     it 'should not require an argument' do
-      lambda { FreshBooks::TimeEntry.list }.should_not raise_error(ArgumentError)
+      lambda { FreshBooks::TimeEntry.list }.should.not.raise(ArgumentError)
     end
     
     it 'should accept an argument' do
-      lambda { FreshBooks::TimeEntry.list('arg') }.should_not raise_error(ArgumentError)
+      lambda { FreshBooks::TimeEntry.list('arg') }.should.not.raise(ArgumentError)
     end
     
     it 'should issue a request for the time_entry list' do
-      FreshBooks.expects(:call_api).with('time_entry.list', {}).returns(@response)
+      FreshBooks.should.receive(:call_api).with('time_entry.list', {}).and_return(@response)
       FreshBooks::TimeEntry.list
     end
     
     it 'should pass the argument to the request' do
-      arg = stub('arg')
-      FreshBooks.expects(:call_api).with('time_entry.list', arg).returns(@response)
+      arg = mock('arg')
+      FreshBooks.should.receive(:call_api).with('time_entry.list', arg).and_return(@response)
       FreshBooks::TimeEntry.list(arg)
     end
     
     describe 'with a successful request' do
-      before :each do
-        @response.stubs(:success?).returns(true)
+      before do
+        @response.stub!(:success?).and_return(true)
       end
       
       it 'should instantiate new time_entry instances from the request' do
         @elements.each do |element|
-          FreshBooks::TimeEntry.expects(:new_from_xml).with(element)
+          FreshBooks::TimeEntry.should.receive(:new_from_xml).with(element)
         end
         FreshBooks::TimeEntry.list
       end
       
       it 'should return the time_entry instances' do
-        vals = Array.new(@elements.length) { stub('return val') }
+        vals = Array.new(@elements.length) { mock('return val') }
         @elements.each_with_index do |element, i|
-          FreshBooks::TimeEntry.stubs(:new_from_xml).with(element).returns(vals[i])
+          FreshBooks::TimeEntry.stub!(:new_from_xml).with(element).and_return(vals[i])
         end
         FreshBooks::TimeEntry.list.should == vals
       end
     end
     
     describe 'with an unsuccessful request' do
-      before :each do
-        @response.stubs(:success?).returns(false)
+      before do
+        @response.stub!(:success?).and_return(false)
       end
       
       it 'should return nil' do
-        FreshBooks::TimeEntry.list.should be_nil
+        FreshBooks::TimeEntry.list.should.be.nil
       end
     end
   end
   
   it 'should have a task' do
-    @time_entry.should respond_to(:task)
+    @time_entry.should.respond_to(:task)
   end
   
   describe 'task' do
     it 'should find task based on task_id' do
-      task_id = stub('task ID')
-      @time_entry.stubs(:task_id).returns(task_id)
-      FreshBooks::Task.expects(:get).with(task_id)
+      task_id = mock('task ID')
+      @time_entry.stub!(:task_id).and_return(task_id)
+      FreshBooks::Task.should.receive(:get).with(task_id)
       @time_entry.task
     end
     
     it 'should return found task' do
-      task = stub('task')
-      task_id = stub('task ID')
-      @time_entry.stubs(:task_id).returns(task_id)
-      FreshBooks::Task.expects(:get).with(task_id).returns(task)
+      task = mock('task')
+      task_id = mock('task ID')
+      @time_entry.stub!(:task_id).and_return(task_id)
+      FreshBooks::Task.should.receive(:get).with(task_id).and_return(task)
       @time_entry.task.should == task
     end
   end
   
   it 'should have a project' do
-    @time_entry.should respond_to(:project)
+    @time_entry.should.respond_to(:project)
   end
   
   describe 'project' do
     it 'should find project based on project_id' do
-      project_id = stub('project ID')
-      @time_entry.stubs(:project_id).returns(project_id)
-      FreshBooks::Project.expects(:get).with(project_id)
+      project_id = mock('project ID')
+      @time_entry.stub!(:project_id).and_return(project_id)
+      FreshBooks::Project.should.receive(:get).with(project_id)
       @time_entry.project
     end
     
     it 'should return found project' do
-      project = stub('project')
-      project_id = stub('project ID')
-      @time_entry.stubs(:project_id).returns(project_id)
-      FreshBooks::Project.expects(:get).with(project_id).returns(project)
+      project = mock('project')
+      project_id = mock('project ID')
+      @time_entry.stub!(:project_id).and_return(project_id)
+      FreshBooks::Project.should.receive(:get).with(project_id).and_return(project)
       @time_entry.project.should == project
     end
   end
