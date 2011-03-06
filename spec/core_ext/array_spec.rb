@@ -2,24 +2,24 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Array do
   it 'should be groupable' do
-    Array.new.should respond_to(:group_by)
+    Array.new.should.respond_to(:group_by)
   end
   
   describe 'when grouping' do
-    before :each do
+    before do
       @array = (1..10).to_a
     end
     
     it 'should require a block' do
-      lambda { @array.group_by }.should raise_error(ArgumentError)
+      lambda { @array.group_by }.should.raise(ArgumentError)
     end
     
     it 'should accept a block' do
-      lambda { @array.group_by {} }.should_not raise_error(ArgumentError)
+      lambda { @array.group_by {} }.should.not.raise(ArgumentError)
     end
     
     it 'should return a hash' do
-      @array.group_by {}.should be_kind_of(Hash)
+      @array.group_by {}.should.be.kind_of(Hash)
     end
     
     it 'should group the elements by the return value of the block' do
