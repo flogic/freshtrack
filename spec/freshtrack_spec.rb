@@ -105,6 +105,20 @@ describe Freshtrack do
         it 'should provide easy access to the project-level token' do
           Freshtrack.token.should == @project_token
         end
+        
+        describe 'and the info is incomplete' do
+          it 'should provide easy access to the top-level company and token if the project-level company is missing' do
+            @config['project_task_mapping'][@project_name].delete(:company)
+            Freshtrack.company.should == @config['company']
+            Freshtrack.token.should   == @config['token']
+          end
+
+          it 'should provide easy access to the top-level company and token if the project-level token is missing' do
+            @config['project_task_mapping'][@project_name].delete(:token)
+            Freshtrack.company.should == @config['company']
+            Freshtrack.token.should   == @config['token']
+          end
+        end
       end
     end
   end
