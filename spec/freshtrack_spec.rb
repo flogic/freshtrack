@@ -41,16 +41,71 @@ describe Freshtrack do
       Freshtrack.stub!(:config).and_return(@config)
     end
     
-    it 'should provide easy access to the company' do
-      Freshtrack.company.should == @config['company']
-    end
-    
-    it 'should provide easy access to the token' do
-      Freshtrack.token.should == @config['token']
-    end
-    
     it 'should provide easy access to the project/task mapping' do
       Freshtrack.project_task_mapping.should == @config['project_task_mapping']
+    end
+    
+    describe 'when no project name is set' do
+      before do
+        Freshtrack.stub!(:project_name).and_return(nil)
+      end
+      
+      it 'should provide easy access to the top-level company' do
+        Freshtrack.company.should == @config['company']
+      end
+      
+      it 'should provide easy access to the top-level token' do
+        Freshtrack.token.should == @config['token']
+      end
+      
+      it 'should return nil for the company if no top-level company is set' do
+        @config.delete('company')
+        Freshtrack.company.should.be.nil
+      end
+      
+      it 'should return nil for the token if no top-level token is set' do
+        @config.delete('token')
+        Freshtrack.token.should.be.nil
+      end
+    end
+    
+    describe 'when a project name is set' do 
+      before do
+        @project_name = 'projone'
+        Freshtrack.stub!(:project_name).and_return(@project_name)
+      end
+      
+      describe 'and the project has no company info set' do
+        before do
+          @config['project_task_mapping'][@project_name].delete(:company)
+          @config['project_task_mapping'][@project_name].delete(:token)
+        end
+        
+        it 'should provide easy access to the top-level company' do
+          Freshtrack.company.should == @config['company']
+        end
+    
+        it 'should provide easy access to the top-level token' do
+          Freshtrack.token.should == @config['token']
+        end
+      end
+      
+      describe 'and the project has company info set' do
+        before do
+          @project_company = 'special_company'
+          @project_token   = '134oiujasdlfkj309'
+          @config['project_task_mapping'][@project_name][:company] = @project_company
+          @config['project_task_mapping'][@project_name][:token]   = @project_token
+        end
+        
+        it 'should provide easy access to the project-level company' do
+          Freshtrack.company.should == @project_company
+        end
+    
+        it 'should provide easy access to the project-level token' do
+          Freshtrack.token.should == @project_token
+        end
+      end
     end
   end
   
@@ -60,7 +115,8 @@ describe Freshtrack do
       @company = 'zee_company_boss'
       @token = 'token goes here'
       Freshtrack.stub!(:load_config)
-      Freshtrack.stub!(:config).and_return({ 'company' => @company, 'token' => @token })
+      Freshtrack.stub!(:company).and_return(@company)
+      Freshtrack.stub!(:token).and_return(@token)
     end
     
     it 'should accept a project name' do

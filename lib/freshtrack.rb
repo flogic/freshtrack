@@ -18,11 +18,15 @@ module Freshtrack
     end
     
     def company
-      config['company']
+      return config['company'] unless project_name
+      info = project_task_mapping[project_name]
+      info[:company] || config['company']
     end
     
     def token
-      config['token']
+      return config['token'] unless project_name
+      info = project_task_mapping[project_name]
+      info[:token] || config['token']
     end
     
     def project_task_mapping
