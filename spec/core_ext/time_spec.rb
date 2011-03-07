@@ -2,17 +2,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Time do
   it 'should be convertible to date' do
-    Time.now.should respond_to(:to_date)
+    Time.now.should.respond_to(:to_date)
   end
   
   describe 'when converting to date' do
-    before :each do
+    before do
       @time = Time.now
       @date = @time.to_date
     end
     
     it 'should return a date' do
-      @date.should be_kind_of(Date)
+      @date.should.be.kind_of(Date)
     end
     
     it 'should return an date with matching year' do
