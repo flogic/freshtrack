@@ -29,23 +29,28 @@ describe Freshtrack do
     
   describe 'getting configuration data' do
     before do
-      @config = {}
+      @config = {
+        'collector' => 'one_inch_punch',
+        'company'   => 'comptastic',
+        'token'     => '13984ujaslkdfj0932',
+        'project_task_mapping' => {
+          'projone' => { :project => 'ProjectOne',  :task => 'ProjectOneTask' },
+          'projtwo' => { :project => 'Project_Two', :task => 'Project_Two_Task' }
+        }
+      }
       Freshtrack.stub!(:config).and_return(@config)
     end
     
-    it 'should provide easy access to the company name' do
-      @config['company'] = company = mock('company name')
-      Freshtrack.company.should == company
+    it 'should provide easy access to the company' do
+      Freshtrack.company.should == @config['company']
     end
     
     it 'should provide easy access to the token' do
-      @config['token'] = token = mock('token')
-      Freshtrack.token.should == token
+      Freshtrack.token.should == @config['token']
     end
     
     it 'should provide easy access to the project/task mapping' do
-      @config['project_task_mapping'] = project_task_mapping = mock('project/task mapping')
-      Freshtrack.project_task_mapping.should == project_task_mapping
+      Freshtrack.project_task_mapping.should == @config['project_task_mapping']
     end
   end
   
