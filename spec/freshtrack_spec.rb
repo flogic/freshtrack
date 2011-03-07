@@ -51,10 +51,29 @@ describe Freshtrack do
   
   describe 'initialization' do
     before do
+      @project_name = 'the_project'
       @company = 'zee_company_boss'
       @token = 'token goes here'
       Freshtrack.stub!(:load_config)
       Freshtrack.stub!(:config).and_return({ 'company' => @company, 'token' => @token })
+    end
+    
+    it 'should accept a project name' do
+      lambda { Freshtrack.init(@project_name) }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should not require a project name' do
+      lambda { Freshtrack.init }.should.not.raise(ArgumentError)
+    end
+    
+    it 'should provide easy access to the project name' do
+      Freshtrack.init(@project_name)
+      Freshtrack.project_name.should == @project_name
+    end
+    
+    it 'should default the project name to nil' do
+      Freshtrack.init
+      Freshtrack.project_name.should.be.nil
     end
     
     it 'should load the configuration' do

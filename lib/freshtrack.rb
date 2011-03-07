@@ -5,10 +5,11 @@ require 'yaml'
 
 module Freshtrack
   class << self
-    attr_reader :config, :project, :task
+    attr_reader :config, :project_name, :project, :task
     
-    def init
+    def init(project = nil)
       load_config
+      @project_name = project
       FreshBooks.setup("#{company}.freshbooks.com", token)
     end
     
