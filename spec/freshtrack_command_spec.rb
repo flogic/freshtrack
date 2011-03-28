@@ -32,8 +32,10 @@ describe 'freshtrack command' do
     run_command
   end
   
-  it 'should init Freshtrack' do
-    Freshtrack.should.receive(:init)
+  it 'should init Freshtrack with the given project' do
+    Freshtrack.should.receive(:init) do |arg|
+      arg.should == @project
+    end
     run_command(@project)
   end
   
@@ -97,8 +99,9 @@ describe 'freshtrack command' do
       self.stub!(:printf)
     end
     
-    def aging_run
-      run_command('--aging')
+    def aging_run(project=nil)
+      args = [project, '--aging'].compact
+      run_command(*args)
     end
     
     it 'should not require a project' do
@@ -106,8 +109,17 @@ describe 'freshtrack command' do
       aging_run
     end
     
-    it 'should init Freshtrack' do
-      Freshtrack.should.receive(:init)
+    it 'should init Freshtrack with a project if given' do
+      Freshtrack.should.receive(:init) do |arg|
+        arg.should == @project
+      end
+      aging_run(@project)
+    end
+    
+    it 'should init Freshtrack for no project if none given' do
+      Freshtrack.should.receive(:init) do |arg|
+        arg.should.be.nil
+      end
       aging_run
     end
     
@@ -177,7 +189,7 @@ describe 'freshtrack command' do
     
     it 'should not track time even when given a project' do
       Freshtrack.should.receive(:track).never
-      run_command('--aging', @project)
+      aging_run(@project)
     end
   end
 end

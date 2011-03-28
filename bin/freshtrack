@@ -42,8 +42,10 @@ BANNER
   end
 end
 
+project = ARGV.shift
+
 if aging
-  Freshtrack.init
+  Freshtrack.init(project)
   aging = Freshtrack.invoice_aging
   printf "%-8s  %-40s  %-5s  %-6s  %8s  %8s\n", 'Invoice', 'Client', 'Age', 'Status', 'Amount', 'Owed'
   printf "%s\n", '-' * 86
@@ -53,12 +55,10 @@ if aging
   exit
 end
 
-project = ARGV.shift
-
 unless project
   puts "Usage: #{File.basename($0)} [project] [options]"
   exit
 end
 
-Freshtrack.init
+Freshtrack.init(project)
 Freshtrack.track(project, OPTIONS)
