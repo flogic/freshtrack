@@ -1,3 +1,8 @@
+== 0.5.0 2011-03-28
+
+* 1 minor enhancement:
+  * Allowing Freshbooks API credentials to appear at a per-project level
+
 == 0.4.2 2009-08-02
 
 * 1 tiny enhancement:
