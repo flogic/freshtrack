@@ -110,7 +110,7 @@ module Freshtrack
 
     def get_unbilled_time_entries(project_name)
       get_project_data(project_name)
-      time_entries = FreshBooks::TimeEntry.list('project_id' => @project.project_id)
+      time_entries = FreshBooks::TimeEntry.list('project_id' => @project.project_id, 'per_page' => 100)
       time_entries.reject(&:billed)
     end
   end

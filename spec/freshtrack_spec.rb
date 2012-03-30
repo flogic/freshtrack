@@ -661,7 +661,7 @@ describe Freshtrack do
     end
 
     it 'should get time entries for the project (based on ID)' do
-      FreshBooks::TimeEntry.should.receive(:list).with('project_id' => @project_id).and_return(@time_entries)
+      FreshBooks::TimeEntry.should.receive(:list).with('project_id' => @project_id, 'per_page' => 100).and_return(@time_entries)
       Freshtrack.get_unbilled_time_entries(@project_name)
     end
 
