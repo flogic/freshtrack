@@ -14,6 +14,7 @@ require 'optparse'
 require 'time'
 
 aging = false
+unbilled = nil
 OPTIONS = {}
 MANDATORY_OPTIONS = %w[]
 
@@ -34,6 +35,8 @@ BANNER
           "Show this help message.") { puts opts; exit }
   opts.on('--aging',
           "Show invoice aging info.") { aging = true }
+  opts.on('--unbilled [PROJECT]', String,
+          "Show unbilled time info.") { |project|  unbilled = project }
 
   opts.parse!(ARGV)
 
@@ -52,6 +55,14 @@ if aging
   aging.each do |inv|
     printf "%-8s  %-40s  %-5s  %-6s  %8.2f  %8.2f\n", *inv.values_at(:number, :client, :age, :status, :amount, :owed)
   end
+  exit
+end
+
+if unbilled
+  project = unbilled
+  Freshtrack.init(project)
+  time = Freshtrack.unbilled_time(project)
+  puts time
   exit
 end
 

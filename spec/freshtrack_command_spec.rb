@@ -192,4 +192,44 @@ describe 'freshtrack command' do
       aging_run(@project)
     end
   end
+
+  describe 'when --unbilled specified' do
+    before do
+      @time_info = 37.5
+      Freshtrack.stub!(:unbilled_time).and_return(@time_info)
+      self.stub!(:puts)
+    end
+    
+    def unbilled_run(project = nil)
+      args = ['--unbilled', project].compact
+      run_command(*args)
+    end
+    
+    it 'should require a project value for the option' do
+      self.should.receive(:puts) { |text|  text.to_s.match(/project.+required/i) }
+      unbilled_run(@project)
+    end
+    
+    it 'should init Freshtrack with the given project' do
+      Freshtrack.should.receive(:init) do |arg|
+        arg.should == @project
+      end
+      unbilled_run(@project)
+    end
+    
+    it 'should get the unbilled time info for the given project' do
+      Freshtrack.should.receive(:unbilled_time).with(@project)
+      unbilled_run(@project)
+    end
+
+    it 'should output the unbilled time' do
+      self.should.receive(:puts) { |text|  text.to_s.match(Regexp.new(Regexp.escape(@time_info.to_s))) }
+      unbilled_run(@project)
+    end
+
+    it 'should not track time' do
+      Freshtrack.should.receive(:track).never
+      unbilled_run
+    end
+  end
 end
