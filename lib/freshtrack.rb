@@ -102,5 +102,15 @@ module Freshtrack
         }
       end
     end
+
+    def time_spent(project_name)
+      time_entries = get_time_entries(project_name)
+      time_entries.collect(&:hours).inject(&:+)
+    end
+
+    def get_time_entries(project_name)
+      get_project_data(project_name)
+      FreshBooks::TimeEntry.list('project_id' => @project.project_id)
+    end
   end
 end
