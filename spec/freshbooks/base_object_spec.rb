@@ -22,6 +22,26 @@ describe FreshBooks::BaseObject do
       @func.call(@date).to_s.should == @date.text
     end
   end
+
+  it 'should have a mapping function for boolean' do
+    FreshBooks::BaseObject::MAPPING_FNS[:boolean].should.respond_to(:call)
+  end
+
+  describe 'boolean mapping function' do
+    before do
+      @func = FreshBooks::BaseObject::MAPPING_FNS[:boolean]
+    end
+
+    it "should convert '0' to false" do
+      @val  = mock('boolean arg', :text => '0')
+      @func.call(@val).should == false
+    end
+
+    it "should convert '1' to true" do
+      @val  = mock('boolean arg', :text => '1')
+      @func.call(@val).should == true
+    end
+  end
   
   describe 'converting an instance to XML' do
     before do
