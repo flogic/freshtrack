@@ -601,4 +601,73 @@ describe Freshtrack do
       Freshtrack.invoice_aging.should == []
     end
   end
+
+  it 'should get unbilled time on a project' do
+    Freshtrack.should.respond_to(:unbilled_time)
+  end
+
+  describe 'getting unbilled time on a project' do
+    before do
+      @project_name = :proj
+      @time_entries = Array.new(3) { mock('time_entry', :hours => rand(10)) }
+      Freshtrack.stub!(:get_unbilled_time_entries).and_return(@time_entries)
+    end
+
+    it 'should require a project name' do
+      lambda { Freshtrack.unbilled_time }.should.raise(ArgumentError)
+    end
+
+    it 'should accept a project name' do
+      lambda { Freshtrack.unbilled_time(@project_name) }.should.not.raise(ArgumentError)
+    end
+
+    it 'should get time entries for the given project' do
+      Freshtrack.should.receive(:get_unbilled_time_entries).with(@project_name).and_return(@time_entries)
+      Freshtrack.unbilled_time(@project_name)
+    end
+
+    it 'should return the sum total hours of the time entries' do
+      total = @time_entries.collect(&:hours).inject(&:+)
+      Freshtrack.unbilled_time(@project_name).should == total
+    end
+  end
+
+  it 'should get unbilled time entries for a project' do
+    Freshtrack.should.respond_to(:get_unbilled_time_entries)
+  end
+
+  describe 'getting unbilled time entries for a project' do
+    before do
+      @project_name = :proj
+      Freshtrack.stub!(:get_project_data)
+      @project_id = 7
+      @project = mock('project', :project_id => @project_id)
+      Freshtrack.instance_variable_set('@project', @project)
+      @time_entries = Array.new(7) { mock('time entry', :billed => rand(2).zero?) }
+      FreshBooks::TimeEntry.stub!(:list).and_return(@time_entries)
+    end
+
+    it 'should require a project name' do
+      lambda { Freshtrack.get_unbilled_time_entries }.should.raise(ArgumentError)
+    end
+
+    it 'should accept a project name' do
+      lambda { Freshtrack.get_unbilled_time_entries(@project_name) }.should.not.raise(ArgumentError)
+    end
+
+    it 'should get project data for the given project name' do
+      Freshtrack.should.receive(:get_project_data).with(@project_name)
+      Freshtrack.get_unbilled_time_entries(@project_name)
+    end
+
+    it 'should get time entries for the project (based on ID)' do
+      FreshBooks::TimeEntry.should.receive(:list).with('project_id' => @project_id, 'per_page' => 100).and_return(@time_entries)
+      Freshtrack.get_unbilled_time_entries(@project_name)
+    end
+
+    it 'should return the unbilled time entries' do
+      expected = @time_entries.reject(&:billed)
+      Freshtrack.get_unbilled_time_entries(@project_name).should == expected
+    end
+  end
 end
