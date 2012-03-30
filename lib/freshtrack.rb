@@ -110,7 +110,8 @@ module Freshtrack
 
     def get_time_entries(project_name)
       get_project_data(project_name)
-      FreshBooks::TimeEntry.list('project_id' => @project.project_id)
+      time_entries = FreshBooks::TimeEntry.list('project_id' => @project.project_id)
+      time_entries.reject(&:billed)
     end
   end
 end

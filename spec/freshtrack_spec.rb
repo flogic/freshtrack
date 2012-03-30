@@ -643,7 +643,7 @@ describe Freshtrack do
       @project_id = 7
       @project = mock('project', :project_id => @project_id)
       Freshtrack.instance_variable_set('@project', @project)
-      @time_entries = Array.new(3) { mock('time entry') }
+      @time_entries = Array.new(7) { mock('time entry', :billed => rand(2).zero?) }
       FreshBooks::TimeEntry.stub!(:list).and_return(@time_entries)
     end
 
@@ -661,12 +661,13 @@ describe Freshtrack do
     end
 
     it 'should get time entries for the project (based on ID)' do
-      FreshBooks::TimeEntry.should.receive(:list).with('project_id' => @project_id)
+      FreshBooks::TimeEntry.should.receive(:list).with('project_id' => @project_id).and_return(@time_entries)
       Freshtrack.get_time_entries(@project_name)
     end
 
-    it 'should return the time entries' do
-      Freshtrack.get_time_entries(@project_name).should == @time_entries
+    it 'should return the unbilled time entries' do
+      expected = @time_entries.reject(&:billed)
+      Freshtrack.get_time_entries(@project_name).should == expected
     end
   end
 end
