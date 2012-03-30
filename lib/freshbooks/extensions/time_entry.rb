@@ -1,10 +1,10 @@
 module FreshBooks
-  TimeEntry = BaseObject.new(:time_entry_id, :project_id, :task_id, :hours, :date, :notes)
+  TimeEntry = BaseObject.new(:time_entry_id, :project_id, :task_id, :hours, :date, :notes, :billed)
   
   class TimeEntry
     TYPE_MAPPINGS = {
       'time_entry_id' => Fixnum, 'project_id' => Fixnum, 'task_id' => Fixnum,
-      'hours' => Float, 'date' => Date
+      'hours' => Float, 'date' => Date, 'billed' => :boolean
     }
     
     class << self

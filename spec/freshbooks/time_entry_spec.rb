@@ -29,6 +29,10 @@ describe FreshBooks::TimeEntry do
     it 'should have notes' do
       @time_entry.should.respond_to(:notes)
     end
+
+    it 'should have billed' do
+      @time_entry.should.respond_to(:billed)
+    end
   end
   
   describe 'type mappings' do
@@ -54,6 +58,10 @@ describe FreshBooks::TimeEntry do
     
     it 'should map date to Date' do
       @mapping['date'].should == Date
+    end
+
+    it 'should map billed to boolean' do
+      @mapping['billed'].should == :boolean
     end
   end
   
