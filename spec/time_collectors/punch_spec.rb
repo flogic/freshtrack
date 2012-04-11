@@ -224,6 +224,15 @@ describe Freshtrack::TimeCollector::Punch do
       result = result.first
       result['hours'].should == 1.5
     end
+
+    it 'should ignore any time data that is not finished' do
+      @time_data.push({ 'in' => Time.local(2012, 1, 25, 6,  25, 0), 'out' => Time.local(2012, 1, 25, 7,  55, 0) })
+      @time_data.push({ 'in' => Time.local(2012, 3, 25, 6,  25, 0)})
+
+      result = @collector.times_to_dates(@time_data)
+      result.length.should == 1
+      result.first['hours'].should == 1.5
+    end
   end
   
   it 'should group date data' do
