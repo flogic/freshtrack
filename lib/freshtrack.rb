@@ -52,22 +52,31 @@ module Freshtrack
     
     def track(project_name, options = {})
       data = get_data(project_name, options)
+      tracked = get_tracked_data(data)
       data.each do |entry_data|
-        create_entry(entry_data)
+        tracked_entry = tracked.detect { |t|  t.date == entry_data['date'] }
+        create_entry(entry_data, tracked_entry)
       end
     end
-    
-    def create_entry(entry_data)
-      time_entry = FreshBooks::TimeEntry.new
-      
+
+    def get_tracked_data(data)
+      return [] if data.empty?
+      dates = data.collect { |d|  d['date'] }
+      FreshBooks::TimeEntry.list('project_id' => project.project_id, 'task_id' => task.task_id, 'date_from' => dates.min, 'date_to' => dates.max)
+    end
+
+    def create_entry(entry_data, time_entry = FreshBooks::TimeEntry.new)
+      time_entry ||= FreshBooks::TimeEntry.new
+
       time_entry.project_id = project.project_id
       time_entry.task_id    = task.task_id
       time_entry.date       = entry_data['date']
       time_entry.hours      = entry_data['hours']
       time_entry.notes      = entry_data['notes']
-      
-      result = time_entry.create
-      
+
+      method = time_entry.time_entry_id ? :update : :create
+      result = time_entry.send(method)
+
       if result
         true
       else

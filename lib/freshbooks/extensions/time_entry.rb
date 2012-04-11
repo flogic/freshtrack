@@ -6,7 +6,9 @@ module FreshBooks
       'time_entry_id' => Fixnum, 'project_id' => Fixnum, 'task_id' => Fixnum,
       'hours' => Float, 'date' => Date, 'billed' => :boolean
     }
-    
+
+    EXCLUDE_XML_ATTRIBUTES = %w[billed]
+
     class << self
       def get(time_entry_id)
         resp = FreshBooks.call_api('time_entry.get', 'time_entry_id' => time_entry_id)
