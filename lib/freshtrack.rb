@@ -64,17 +64,18 @@ module Freshtrack
       FreshBooks::TimeEntry.list('project_id' => project.project_id, 'task_id' => task.task_id, 'date_from' => dates.min, 'date_to' => dates.max)
     end
 
-    def create_entry(entry_data)
-      time_entry = FreshBooks::TimeEntry.new
-      
+    def create_entry(entry_data, time_entry = FreshBooks::TimeEntry.new)
+      time_entry ||= FreshBooks::TimeEntry.new
+
       time_entry.project_id = project.project_id
       time_entry.task_id    = task.task_id
       time_entry.date       = entry_data['date']
       time_entry.hours      = entry_data['hours']
       time_entry.notes      = entry_data['notes']
-      
-      result = time_entry.create
-      
+
+      method = time_entry.time_entry_id ? :update : :create
+      result = time_entry.send(method)
+
       if result
         true
       else

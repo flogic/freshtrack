@@ -468,95 +468,264 @@ describe Freshtrack do
       @hours = 5.67
       @notes = 'notes for the time entry'
       @entry_data = { 'date' => @date, 'hours' => @hours, 'notes' => @notes }
-      @time_entry = mock('time entry', :project_id= => nil, :task_id= => nil, :date= => nil, :hours= => nil, :notes= => nil, :create => true)
+      @time_entry = FreshBooks::TimeEntry.new
+      @time_entry.stub!(:create)
+      @time_entry.stub!(:update)
       FreshBooks::TimeEntry.stub!(:new).and_return(@time_entry)
-      
+
       @project = mock('project', :project_id => mock('project id'))
       @task    = mock('task',    :task_id    => mock('task id'))
       Freshtrack.stub!(:project).and_return(@project)
       Freshtrack.stub!(:task).and_return(@task)
-      
+
       STDERR.stub!(:puts)
     end
-    
+
     it 'should require an argument' do
       lambda { Freshtrack.create_entry }.should.raise(ArgumentError)
     end
-    
+
     it 'should accept an argument' do
       lambda { Freshtrack.create_entry(@entry_data) }.should.not.raise(ArgumentError)
     end
-    
-    it 'should instantiate a new time entry' do
-      FreshBooks::TimeEntry.should.receive(:new).and_return(@time_entry)
-      Freshtrack.create_entry(@entry_data)
+
+    it 'should accept a time entry argument' do
+      lambda { Freshtrack.create_entry(@entry_data, @time_entry) }.should.not.raise(ArgumentError)
     end
-    
-    describe 'with the time entry instance' do
-      it 'should set the project' do
-        @time_entry.should.receive(:project_id=).with(@project.project_id)
+
+    describe 'when given no time entry argument' do
+      it 'should instantiate a new time entry' do
+        FreshBooks::TimeEntry.should.receive(:new).and_return(@time_entry)
         Freshtrack.create_entry(@entry_data)
       end
-      
-      it 'should set the task' do
-        @time_entry.should.receive(:task_id=).with(@task.task_id)
-        Freshtrack.create_entry(@entry_data)
-      end
-      
-      it 'should set the date' do
-        @time_entry.should.receive(:date=).with(@date)
-        Freshtrack.create_entry(@entry_data)
-      end
-      
-      it 'should set the hours' do
-        @time_entry.should.receive(:hours=).with(@hours)
-        Freshtrack.create_entry(@entry_data)
-      end
-      
-      it 'should set the notes' do
-        @time_entry.should.receive(:notes=).with(@notes)
-        Freshtrack.create_entry(@entry_data)
-      end
-    end
-    
-    it 'should create the time entry' do
-      @time_entry.should.receive(:create)
-      Freshtrack.create_entry(@entry_data)
-    end
-    
-    describe 'successfully' do
-      before do
-        @time_entry.stub!(:create).and_return(5)
-      end
-      
-      it 'should be silent' do
-        STDERR.should.receive(:puts).never
-        Freshtrack.create_entry(@entry_data)
-      end
-      
-      it 'should return true' do
-        Freshtrack.create_entry(@entry_data).should == true
-      end
-    end
-    
-    describe 'unsuccessfully' do
-      before do
-        @time_entry.stub!(:create).and_return(nil)
-      end
-      
-      it 'should output an indication' do
-        STDERR.should.receive(:puts) do |arg|
-          arg.should.match(/#{@date.to_s}/)
+
+      describe 'with the time entry instance' do
+        it 'should set the project' do
+          @time_entry.should.receive(:project_id=).with(@project.project_id)
+          Freshtrack.create_entry(@entry_data)
         end
+
+        it 'should set the task' do
+          @time_entry.should.receive(:task_id=).with(@task.task_id)
+          Freshtrack.create_entry(@entry_data)
+        end
+
+        it 'should set the date' do
+          @time_entry.should.receive(:date=).with(@date)
+          Freshtrack.create_entry(@entry_data)
+        end
+
+        it 'should set the hours' do
+          @time_entry.should.receive(:hours=).with(@hours)
+          Freshtrack.create_entry(@entry_data)
+        end
+
+        it 'should set the notes' do
+          @time_entry.should.receive(:notes=).with(@notes)
+          Freshtrack.create_entry(@entry_data)
+        end
+      end
+
+      it 'should create the time entry' do
+        @time_entry.should.receive(:create)
         Freshtrack.create_entry(@entry_data)
       end
-      
-      it 'should return nil' do
-        Freshtrack.create_entry(@entry_data).should.be.nil
+
+      it 'should not update the time entry' do
+        @time_entry.should.receive(:update).never
+        Freshtrack.create_entry(@entry_data)
+      end
+
+      describe 'successfully' do
+        before do
+          @time_entry.stub!(:create).and_return(5)
+        end
+
+        it 'should be silent' do
+          STDERR.should.receive(:puts).never
+          Freshtrack.create_entry(@entry_data)
+        end
+
+        it 'should return true' do
+          Freshtrack.create_entry(@entry_data).should == true
+        end
+      end
+
+      describe 'unsuccessfully' do
+        before do
+          @time_entry.stub!(:create).and_return(nil)
+        end
+
+        it 'should output an indication' do
+          STDERR.should.receive(:puts) do |arg|
+            arg.should.match(/#{@date.to_s}/)
+          end
+          Freshtrack.create_entry(@entry_data)
+        end
+
+        it 'should return nil' do
+          Freshtrack.create_entry(@entry_data).should.be.nil
+        end
+      end
+    end
+
+    describe 'when given a nil time entry argument' do
+      it 'should instantiate a new time entry' do
+        FreshBooks::TimeEntry.should.receive(:new).and_return(@time_entry)
+        Freshtrack.create_entry(@entry_data, nil)
+      end
+
+      describe 'with the time entry instance' do
+        it 'should set the project' do
+          @time_entry.should.receive(:project_id=).with(@project.project_id)
+          Freshtrack.create_entry(@entry_data, nil)
+        end
+
+        it 'should set the task' do
+          @time_entry.should.receive(:task_id=).with(@task.task_id)
+          Freshtrack.create_entry(@entry_data, nil)
+        end
+
+        it 'should set the date' do
+          @time_entry.should.receive(:date=).with(@date)
+          Freshtrack.create_entry(@entry_data, nil)
+        end
+
+        it 'should set the hours' do
+          @time_entry.should.receive(:hours=).with(@hours)
+          Freshtrack.create_entry(@entry_data, nil)
+        end
+
+        it 'should set the notes' do
+          @time_entry.should.receive(:notes=).with(@notes)
+          Freshtrack.create_entry(@entry_data, nil)
+        end
+      end
+
+      it 'should create the time entry' do
+        @time_entry.should.receive(:create)
+        Freshtrack.create_entry(@entry_data, nil)
+      end
+
+      it 'should not update the time entry' do
+        @time_entry.should.receive(:update).never
+        Freshtrack.create_entry(@entry_data)
+      end
+
+      describe 'successfully' do
+        before do
+          @time_entry.stub!(:create).and_return(5)
+        end
+
+        it 'should be silent' do
+          STDERR.should.receive(:puts).never
+          Freshtrack.create_entry(@entry_data, nil)
+        end
+
+        it 'should return true' do
+          Freshtrack.create_entry(@entry_data, nil).should == true
+        end
+      end
+
+      describe 'unsuccessfully' do
+        before do
+          @time_entry.stub!(:create).and_return(nil)
+        end
+
+        it 'should output an indication' do
+          STDERR.should.receive(:puts) do |arg|
+            arg.should.match(/#{@date.to_s}/)
+          end
+          Freshtrack.create_entry(@entry_data, nil)
+        end
+
+        it 'should return nil' do
+          Freshtrack.create_entry(@entry_data, nil).should.be.nil
+        end
+      end
+    end
+
+    describe 'when given an existing time entry argument' do
+      before do
+        @time_entry.time_entry_id = 293
+      end
+
+      it 'should not instantiate a new time entry' do
+        FreshBooks::TimeEntry.should.receive(:new).never
+        Freshtrack.create_entry(@entry_data, @time_entry)
+      end
+
+      describe 'with the time entry instance' do
+        it 'should set the project' do
+          @time_entry.should.receive(:project_id=).with(@project.project_id)
+          Freshtrack.create_entry(@entry_data, @time_entry)
+        end
+
+        it 'should set the task' do
+          @time_entry.should.receive(:task_id=).with(@task.task_id)
+          Freshtrack.create_entry(@entry_data, @time_entry)
+        end
+
+        it 'should set the date' do
+          @time_entry.should.receive(:date=).with(@date)
+          Freshtrack.create_entry(@entry_data, @time_entry)
+        end
+
+        it 'should set the hours' do
+          @time_entry.should.receive(:hours=).with(@hours)
+          Freshtrack.create_entry(@entry_data, @time_entry)
+        end
+
+        it 'should set the notes' do
+          @time_entry.should.receive(:notes=).with(@notes)
+          Freshtrack.create_entry(@entry_data, @time_entry)
+        end
+      end
+
+      it 'should update the time entry' do
+        @time_entry.should.receive(:update)
+        Freshtrack.create_entry(@entry_data, @time_entry)
+      end
+
+      it 'should not create the time entry' do
+        @time_entry.should.receive(:create).never
+        Freshtrack.create_entry(@entry_data, @time_entry)
+      end
+
+      describe 'successfully' do
+        before do
+          @time_entry.stub!(:update).and_return(true)
+        end
+
+        it 'should be silent' do
+          STDERR.should.receive(:puts).never
+          Freshtrack.create_entry(@entry_data, @time_entry)
+        end
+
+        it 'should return true' do
+          Freshtrack.create_entry(@entry_data, @time_entry).should == true
+        end
+      end
+
+      describe 'unsuccessfully' do
+        before do
+          @time_entry.stub!(:update).and_return(false)
+        end
+
+        it 'should output an indication' do
+          STDERR.should.receive(:puts) do |arg|
+            arg.should.match(/#{@date.to_s}/)
+          end
+          Freshtrack.create_entry(@entry_data, @time_entry)
+        end
+
+        it 'should return nil' do
+          Freshtrack.create_entry(@entry_data, @time_entry).should.be.nil
+        end
       end
     end
   end
-  
+
   it 'should list open invoices' do
     Freshtrack.should.respond_to(:open_invoices)
   end
