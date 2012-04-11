@@ -11,5 +11,5 @@ Gem::Specification.new do |gem|
   gem.name = 'freshtrack'
   gem.require_paths = ['lib']
   gem.summary = %q{Track your time on FreshBooks}
-  gem.version = '0.6.0'
+  gem.version = '0.7.0'
 end

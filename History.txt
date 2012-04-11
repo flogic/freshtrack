@@ -1,3 +1,10 @@
+== 0.7.0 2012-03-30
+
+* 1 minor enhancement:
+  * Tracking time is now idempotent. If a time entry already exists for a date/project/task combination, that time entry will be updated rather than a new entry created.
+* 1 bugfix:
+  * Tracking time for a project when you're punched in no longer raises an exception. Time entries that aren't completed (not punched out) are now ignored.
+
 == 0.6.0 2012-03-30
 
 * 1 minor enhancement:
