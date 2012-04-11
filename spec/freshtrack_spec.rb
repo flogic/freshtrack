@@ -355,12 +355,14 @@ describe Freshtrack do
       lambda { Freshtrack.collector }.should.raise(LoadError)
     end
   end
-  
+
   describe 'tracking time' do
     before do
       @project_name = :proj
       @data = []
+      @tracked = []
       Freshtrack.stub!(:get_data).and_return(@data)
+      Freshtrack.stub!(:get_tracked_data).and_return(@tracked)
     end
     
     it 'should require an argument' do
@@ -398,7 +400,12 @@ describe Freshtrack do
       end
       Freshtrack.track(@project_name)
     end
-    
+
+    it 'should get already-tracked time, passing the data along' do
+      Freshtrack.should.receive(:get_tracked_data).with(@data)
+      Freshtrack.track(@project_name)
+    end
+
     it 'should create entries for project data' do
       2.times do
         ent = mock('entry data')
@@ -408,7 +415,53 @@ describe Freshtrack do
       Freshtrack.track(@project_name)
     end
   end
-  
+
+  describe 'getting already-tracked time' do
+    before do
+      @data = [{ 'date' => Date.today - 3 }]
+      @tracked = []
+      FreshBooks::TimeEntry.stub!(:list).and_return(@tracked)
+
+      @project = mock('project', :project_id => mock('project id'))
+      @task    = mock('task',    :task_id    => mock('task id'))
+      Freshtrack.stub!(:project).and_return(@project)
+      Freshtrack.stub!(:task).and_return(@task)
+    end
+
+    it 'should accept data' do
+      lambda { Freshtrack.get_tracked_data(@data) }.should.not.raise(ArgumentError)
+    end
+
+    it 'should require data' do
+      lambda { Freshtrack.get_tracked_data }.should.raise(ArgumentError)
+    end
+
+    it 'should get a list of time entries based upon the data' do
+      data = Array.new(3) { |i|  { 'date' => Date.today - i*3 } } + Array.new(3) { |i|  { 'date' => Date.today - 5 + i*2 } }
+      data_options = { 'project_id' => @project.project_id, 'task_id' => @task.task_id }
+      data_options['date_from'] = data.collect { |d|  d['date'] }.min
+      data_options['date_to']   = data.collect { |d|  d['date'] }.max
+
+      FreshBooks::TimeEntry.should.receive(:list).with(data_options)
+      Freshtrack.get_tracked_data(data)
+    end
+
+    it 'should return the list of time entries' do
+      entries = Object.new
+      FreshBooks::TimeEntry.stub!(:list).and_return(entries)
+      Freshtrack.get_tracked_data(@data).should == entries
+    end
+
+    it 'should not bother getting data for empty input' do
+      FreshBooks::TimeEntry.should.receive(:list).never
+      Freshtrack.get_tracked_data([])
+    end
+
+    it 'should return an empty list for empty input' do
+      Freshtrack.get_tracked_data([]).should == []
+    end
+  end
+
   describe 'creating an entry' do
     before do
       @date = Date.today - 3
