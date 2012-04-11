@@ -364,26 +364,26 @@ describe Freshtrack do
       Freshtrack.stub!(:get_data).and_return(@data)
       Freshtrack.stub!(:get_tracked_data).and_return(@tracked)
     end
-    
+
     it 'should require an argument' do
       lambda { Freshtrack.track }.should.raise(ArgumentError)
     end
-    
+
     it 'should accept an argument' do
       lambda { Freshtrack.track(@project_name) }.should.not.raise(ArgumentError)
     end
-    
+
     it 'should accept options' do
       lambda { Freshtrack.track(@project_name, :before => Time.now) }.should.not.raise(ArgumentError)
     end
-    
+
     it 'should get data for supplied project' do
       Freshtrack.should.receive(:get_data).and_return(@data) do |project, _|
         project.should == @project_name
       end
       Freshtrack.track(@project_name)
     end
-    
+
     it 'should pass options on when getting data' do
       options = { :after => Time.now - 12345 }
       Freshtrack.should.receive(:get_data).and_return(@data) do |project, opts|
@@ -392,7 +392,7 @@ describe Freshtrack do
       end
       Freshtrack.track(@project_name, options)
     end
-    
+
     it 'should default options to an empty hash' do
       Freshtrack.should.receive(:get_data).and_return(@data) do |project, opts|
         project.should == @project_name
@@ -406,11 +406,22 @@ describe Freshtrack do
       Freshtrack.track(@project_name)
     end
 
-    it 'should create entries for project data' do
-      2.times do
-        ent = mock('entry data')
-        @data.push(ent)
-        Freshtrack.should.receive(:create_entry).with(ent)
+    it 'should create entries for project data, matching them with the already-tracked time by date' do
+      data = Array.new(5) { |i|  { 'date' => Date.today - i*2 } }
+      tracked = Array.new(5) { |i|  te = FreshBooks::TimeEntry.new; te.date = Date.today - i*3; te }
+      Freshtrack.stub!(:get_data).and_return(data)
+      Freshtrack.stub!(:get_tracked_data).and_return(tracked)
+
+      matches = {
+        data[0] => tracked[0],
+        data[1] => nil,
+        data[2] => nil,
+        data[3] => tracked[2],
+        data[4] => nil
+      }
+
+      matches.each do |data, entry|
+        Freshtrack.should.receive(:create_entry).with(data, entry)
       end
       Freshtrack.track(@project_name)
     end

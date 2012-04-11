@@ -54,7 +54,8 @@ module Freshtrack
       data = get_data(project_name, options)
       tracked = get_tracked_data(data)
       data.each do |entry_data|
-        create_entry(entry_data)
+        tracked_entry = tracked.detect { |t|  t.date == entry_data['date'] }
+        create_entry(entry_data, tracked_entry)
       end
     end
 
