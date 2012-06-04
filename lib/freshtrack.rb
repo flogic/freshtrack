@@ -38,11 +38,11 @@ module Freshtrack
     end
     
     def get_project_data(project_name)
-      raise unless mapping = project_task_mapping[project_name]
+      raise "Could not find a mapping for project named `#{project_name}`" unless mapping = project_task_mapping[project_name]
       @project = FreshBooks::Project.find_by_name(mapping[:project])
-      raise unless @project
+      raise "Could not locate a FreshBooks project called `#{mapping[:project]}`" unless @project
       @task = FreshBooks::Task.find_by_name(mapping[:task])
-      raise unless @task
+      raise "Could not locate a FreshBooks task called `#{mapping[:task]}`" unless @task
     end
     
     def get_data(project_name, options = {})
